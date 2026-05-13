@@ -9,7 +9,7 @@
 const SEPAY_API_KEY = import.meta.env.VITE_SEPAY_API_KEY?.trim();
 const SEPAY_BASE = 'https://my.sepay.vn/userapi';
 
-const PRICE = 5000; // VND
+const PRICE = 1000; // VND
 const BANK_ACCOUNT = ''; // Will be fetched from SePay account info
 const DESCRIPTION_PREFIX = 'TOMATO';
 

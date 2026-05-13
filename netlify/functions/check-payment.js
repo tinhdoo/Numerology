@@ -42,7 +42,7 @@ exports.handler = async (event) => {
     const found = txns.find(t => {
       const content = String(t.transaction_content || t.description || t.code || t.content || '');
       const amount = Number(t.amount_in || t.amount || t.transferAmount || 0);
-      return content.toUpperCase().includes(code.toUpperCase()) && amount >= 5000;
+      return content.toUpperCase().includes(code.toUpperCase()) && amount >= 1000;
     });
 
     return {
