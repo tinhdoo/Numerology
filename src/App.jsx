@@ -218,8 +218,8 @@ const App = () => {
       const code = generateTransactionCode();
       setTxCode(code);
       setQrUrl(getVietQRUrl({
-        bankId: 'TPBANK', 
-        accountNo: '04179680001', 
+        bankId: 'BIDV', 
+        accountNo: '5611355650', 
         amount: PRICE, 
         description: code,
       }));
