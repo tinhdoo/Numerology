@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Star, Moon, Layers, ChevronRight, ChevronDown, Zap, Bot, Loader2, ArrowRight, Briefcase, Coins, Heart, Users, MessageCircle, AlertTriangle, Infinity, Home, Hash, Shuffle, Lock } from 'lucide-react';
-import { 
-  calculateLifePath, calculateNameNumber, 
-  calculatePersonalYear, getDetailedAnalysis 
+import {
+  calculateLifePath, calculateNameNumber,
+  calculatePersonalYear, getDetailedAnalysis
 } from './utils/numerology';
 import { westernDeck } from './utils/westernCards';
 import { generateAIAdvice, askFollowUpQuestion, generateIndividualCardMeanings, generateNumerologyReport, generateMonthlyPredictions, generateSoulmateAnalysis } from './utils/aiWisdom';
@@ -13,11 +13,11 @@ const useMousePosition = () => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0, px: 0, py: 0 });
   useEffect(() => {
     const handleMouseMove = (e) => {
-      setMousePos({ 
+      setMousePos({
         x: e.clientX,
         y: e.clientY,
-        px: (e.clientX / window.innerWidth - 0.5) * 40, 
-        py: (e.clientY / window.innerHeight - 0.5) * 40 
+        px: (e.clientX / window.innerWidth - 0.5) * 40,
+        py: (e.clientY / window.innerHeight - 0.5) * 40
       });
     };
     window.addEventListener('mousemove', handleMouseMove);
@@ -28,7 +28,7 @@ const useMousePosition = () => {
 
 const ShootingStars = () => {
   const [stars, setStars] = useState([]);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       if (Math.random() > 0.5) {
@@ -71,7 +71,7 @@ const FormattedText = ({ text }) => {
     .replace(/\*(.*?)\*/g, '<em style="color: #cbd5e1;">$1</em>')
     .replace(/^>\s?(.*)$/gm, '<blockquote style="border-left: 3px solid var(--primary-light); padding-left: 1rem; margin: 1.5rem 0; color: var(--primary-light); font-style: italic; background: rgba(139, 92, 246, 0.05); padding: 1rem; border-radius: 0 8px 8px 0;">$1</blockquote>')
     .replace(/^- (.*)$/gm, '<li style="margin-bottom: 0.5rem; margin-left: 1.5rem; list-style-type: none; position: relative;"><span style="color: var(--primary-light); position: absolute; left: -1.2rem; top: 0.1rem; font-size: 0.8rem;">✦</span>$1</li>');
-    
+
   htmlText = htmlText.replace(/(<li.*?>.*?<\/li>(\n)?)+/g, '<ul style="margin: 0.5rem 0; padding: 0;">$&</ul>');
 
   return <div dangerouslySetInnerHTML={{ __html: htmlText }} style={{ whiteSpace: 'pre-wrap', lineHeight: '1.7', wordBreak: 'break-word' }} />;
@@ -79,15 +79,15 @@ const FormattedText = ({ text }) => {
 
 const App = () => {
   const mousePos = useMousePosition();
-  const [currentView, setCurrentView] = useState('home'); 
+  const [currentView, setCurrentView] = useState('home');
   const [formData, setFormData] = useState({ name: '', dob: '' });
   const [dobParts, setDobParts] = useState({ day: '', month: '', year: '' });
   const [formError, setFormError] = useState('');
   const [numResults, setNumResults] = useState(null);
   const [numLoading, setNumLoading] = useState(false);
   const [monthlyPredictions, setMonthlyPredictions] = useState(null);
-  
-  const [westernStep, setWesternStep] = useState(1); 
+
+  const [westernStep, setWesternStep] = useState(1);
   const [westernConfig, setWesternConfig] = useState({ gender: 'Nam', category: 'Tương lai', shuffleGoal: 7 });
   const [shuffleCount, setShuffleCount] = useState(0);
   const [isShuffling, setIsShuffling] = useState(false);
@@ -134,7 +134,7 @@ const App = () => {
 
   const handleNumerology = (e) => {
     e.preventDefault();
-    
+
     const day = parseInt(dobParts.day, 10);
     const month = parseInt(dobParts.month, 10);
     const year = parseInt(dobParts.year, 10);
@@ -166,7 +166,7 @@ const App = () => {
     }
 
     setFormError('');
-    
+
     const dob = `${year}-${dobParts.month.padStart(2, '0')}-${dobParts.day.padStart(2, '0')}`;
     const lp = calculateLifePath(dob);
     const destiny = calculateNameNumber(formData.name, 'destiny');
@@ -218,9 +218,9 @@ const App = () => {
       const code = generateTransactionCode();
       setTxCode(code);
       setQrUrl(getVietQRUrl({
-        bankId: 'BIDV', 
-        accountNo: '5611355650', 
-        amount: PRICE, 
+        bankId: 'BIDV',
+        accountNo: '5611355650',
+        amount: PRICE,
         description: code,
       }));
       setPayStatus('qr');
@@ -258,7 +258,7 @@ const App = () => {
     setIsShuffling(true);
     if (shuffleSound.current) {
       shuffleSound.current.currentTime = 0;
-      shuffleSound.current.play().catch(() => {});
+      shuffleSound.current.play().catch(() => { });
     }
     setTimeout(() => {
       setShuffleCount(prev => prev + 1);
@@ -338,560 +338,560 @@ const App = () => {
 
   return (
     <>
-    <div className="app-wrapper">
-      <div className="cursor-trail" style={{ left: mousePos.x, top: mousePos.y }} />
-      <ShootingStars />
-      <div className="celestial-bg" style={{ transform: `translate(${mousePos.px}px, ${mousePos.py}px)`, transition: 'transform 0.1s ease-out' }}>
-        <div className="nebula-glow" style={{ top: '-20%', left: '-10%', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 60%)' }}></div>
-        <div className="nebula-glow" style={{ bottom: '-20%', right: '-10%', background: 'radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 60%)' }}></div>
-        <div className="stars-layer"></div>
-      </div>
+      <div className="app-wrapper">
+        <div className="cursor-trail" style={{ left: mousePos.x, top: mousePos.y }} />
+        <ShootingStars />
+        <div className="celestial-bg" style={{ transform: `translate(${mousePos.px}px, ${mousePos.py}px)`, transition: 'transform 0.1s ease-out' }}>
+          <div className="nebula-glow" style={{ top: '-20%', left: '-10%', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 60%)' }}></div>
+          <div className="nebula-glow" style={{ bottom: '-20%', right: '-10%', background: 'radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 60%)' }}></div>
+          <div className="stars-layer"></div>
+        </div>
 
-      <nav className="nav-premium">
-        <button className={`nav-link ${currentView === 'home' ? 'active' : ''}`} onClick={() => setCurrentView('home')}>Khám Phá</button>
-        <button className={`nav-link ${currentView === 'numerology' ? 'active' : ''}`} onClick={() => setCurrentView('numerology')}>Thần Số Học</button>
-        <button className={`nav-link ${currentView === 'western' ? 'active' : ''}`} onClick={() => setCurrentView('western')}>Bói Bài Tây</button>
-        <button className={`nav-link ${currentView === 'soulmate' ? 'active' : ''}`} onClick={() => setCurrentView('soulmate')}>Tương Hợp</button>
-      </nav>
+        <nav className="nav-premium">
+          <button className={`nav-link ${currentView === 'home' ? 'active' : ''}`} onClick={() => setCurrentView('home')}>Khám Phá</button>
+          <button className={`nav-link ${currentView === 'numerology' ? 'active' : ''}`} onClick={() => setCurrentView('numerology')}>Thần Số Học</button>
+          <button className={`nav-link ${currentView === 'western' ? 'active' : ''}`} onClick={() => setCurrentView('western')}>Bói Bài Tây</button>
+          <button className={`nav-link ${currentView === 'soulmate' ? 'active' : ''}`} onClick={() => setCurrentView('soulmate')}>Tương Hợp</button>
+        </nav>
 
-      {/* Mobile Bottom Navigation */}
-      <nav className="bottom-nav">
-        {[
-          { id: 'home',      label: 'Trang chủ', Icon: Home,     activeColor: '#a78bfa' },
-          { id: 'numerology',label: 'Thần số',   Icon: Hash,     activeColor: '#818cf8' },
-          { id: 'western',   label: 'Bói bài',   Icon: Shuffle,  activeColor: '#60a5fa' },
-          { id: 'soulmate',  label: 'Tương hợp', Icon: Heart,    activeColor: '#f43f5e' },
-        ].map(({ id, label, Icon, activeColor }) => {
-          const isActive = currentView === id;
-          return (
-            <button
-              key={id}
-              className={`bottom-nav-item ${isActive ? 'active' : ''}`}
-              onClick={() => setCurrentView(id)}
-            >
-              <div className="bottom-nav-icon" style={isActive ? { background: `${activeColor}25`, boxShadow: `0 0 14px ${activeColor}60` } : {}}>
-                <Icon size={20} color={isActive ? activeColor : 'var(--text-dim)'} strokeWidth={isActive ? 2.5 : 1.5} />
-              </div>
-              <span style={{ color: isActive ? activeColor : '' }}>{label}</span>
-            </button>
-          );
-        })}
-      </nav>
-
-      <main className="main-container">
-        <AnimatePresence mode="wait">
-          {currentView === 'home' && (
-            <motion.section key="home" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
-              <div style={{ minHeight: 'calc(100dvh - 70px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: '1rem' }}>
-              {/* Hero */}
-              <div style={{ textAlign: 'center', padding: '0 1rem 1.25rem' }}>
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, ease: 'easeOut' }}
-                >
-                  <h1 className="hero-title primary-gradient-text" style={{ marginBottom: '0.5rem' }}>TOMATO</h1>
-                  <p style={{ color: '#555', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500, fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>
-                    Tiềm năng&nbsp;•&nbsp;Duyên số&nbsp;•&nbsp;Trực giác
-                  </p>
-                </motion.div>
-              </div>
-
-              {/* Feature Cards */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem', padding: '0 1rem' }}>
-                
-                {/* Card 1 — Thần Số Học */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1, duration: 0.4 }}
-                  onClick={() => setCurrentView('numerology')}
-                  whileTap={{ scale: 0.98 }}
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(139,92,246,0.18) 0%, rgba(99,102,241,0.08) 100%)',
-                    border: '1px solid rgba(139,92,246,0.3)',
-                    borderRadius: '20px', padding: '1.25rem 1.25rem 1.25rem 1.5rem',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem',
-                    position: 'relative', overflow: 'hidden',
-                  }}
-                >
-                  <div style={{ position: 'absolute', top: '-30px', right: '-20px', width: '100px', height: '100px', background: 'radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
-                  <div style={{ width: '52px', height: '52px', borderRadius: '16px', background: 'linear-gradient(135deg, #8b5cf6, #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 15px rgba(139,92,246,0.4)' }}>
-                    <Sparkles size={24} color="#fff" />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#fff', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Thần Số Học</div>
-                    <div style={{ color: '#555', fontSize: '0.76rem', lineHeight: 1.4, fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Giải mã chỉ số đường đời &amp; năng lượng cá nhân</div>
-                  </div>
-                  <ChevronRight size={18} color="rgba(139,92,246,0.8)" style={{ flexShrink: 0 }} />
-                </motion.div>
-
-                {/* Card 2 — Bói Bài Tây */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18, duration: 0.4 }}
-                  onClick={() => setCurrentView('western')}
-                  whileTap={{ scale: 0.98 }}
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(96,165,250,0.18) 0%, rgba(59,130,246,0.08) 100%)',
-                    border: '1px solid rgba(96,165,250,0.3)',
-                    borderRadius: '20px', padding: '1.25rem 1.25rem 1.25rem 1.5rem',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem',
-                    position: 'relative', overflow: 'hidden',
-                  }}
-                >
-                  <div style={{ position: 'absolute', top: '-30px', right: '-20px', width: '100px', height: '100px', background: 'radial-gradient(circle, rgba(96,165,250,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
-                  <div style={{ width: '52px', height: '52px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6, #60a5fa)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 15px rgba(59,130,246,0.4)' }}>
-                    <Layers size={24} color="#fff" />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#fff', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Bói Bài Tây</div>
-                    <div style={{ color: '#555', fontSize: '0.76rem', lineHeight: 1.4, fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Trải 3 lá bài nhận thông điệp từ vũ trụ</div>
-                  </div>
-                  <ChevronRight size={18} color="rgba(96,165,250,0.8)" style={{ flexShrink: 0 }} />
-                </motion.div>
-
-                {/* Card 3 — Tương Hợp */}
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.26, duration: 0.4 }}
-                  onClick={() => setCurrentView('soulmate')}
-                  whileTap={{ scale: 0.98 }}
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(244,63,94,0.18) 0%, rgba(236,72,153,0.08) 100%)',
-                    border: '1px solid rgba(244,63,94,0.3)',
-                    borderRadius: '20px', padding: '1.25rem 1.25rem 1.25rem 1.5rem',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem',
-                    position: 'relative', overflow: 'hidden',
-                  }}
-                >
-                  <div style={{ position: 'absolute', top: '-30px', right: '-20px', width: '100px', height: '100px', background: 'radial-gradient(circle, rgba(244,63,94,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
-                  <div style={{ width: '52px', height: '52px', borderRadius: '16px', background: 'linear-gradient(135deg, #f43f5e, #ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 15px rgba(244,63,94,0.4)' }}>
-                    <Heart size={24} color="#fff" />
-                  </div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#fff', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Tương Hợp Tâm Linh</div>
-                    <div style={{ color: '#555', fontSize: '0.76rem', lineHeight: 1.4, fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>AI phân tích nghiệp duyên &amp; cảnh báo tình cảm</div>
-                  </div>
-                  <ChevronRight size={18} color="rgba(244,63,94,0.8)" style={{ flexShrink: 0 }} />
-                </motion.div>
-
-              </div>
-
-              {/* Footer tagline */}
-              <motion.div
-                initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
-                style={{ textAlign: 'center', padding: '1rem 1rem 0', color: 'rgba(255,255,255,0.12)', fontSize: '10px', letterSpacing: '0.05em' }}
+        {/* Mobile Bottom Navigation */}
+        <nav className="bottom-nav">
+          {[
+            { id: 'home', label: 'Trang chủ', Icon: Home, activeColor: '#a78bfa' },
+            { id: 'numerology', label: 'Thần số', Icon: Hash, activeColor: '#818cf8' },
+            { id: 'western', label: 'Bói bài', Icon: Shuffle, activeColor: '#60a5fa' },
+            { id: 'soulmate', label: 'Tương hợp', Icon: Heart, activeColor: '#f43f5e' },
+          ].map(({ id, label, Icon, activeColor }) => {
+            const isActive = currentView === id;
+            return (
+              <button
+                key={id}
+                className={`bottom-nav-item ${isActive ? 'active' : ''}`}
+                onClick={() => setCurrentView(id)}
               >
-                <span style={{ fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Powered by AI&nbsp;·&nbsp;Thần số học Pythagoras</span>
-              </motion.div>
+                <div className="bottom-nav-icon" style={isActive ? { background: `${activeColor}25`, boxShadow: `0 0 14px ${activeColor}60` } : {}}>
+                  <Icon size={20} color={isActive ? activeColor : 'var(--text-dim)'} strokeWidth={isActive ? 2.5 : 1.5} />
+                </div>
+                <span style={{ color: isActive ? activeColor : '' }}>{label}</span>
+              </button>
+            );
+          })}
+        </nav>
 
-              </div>
-            </motion.section>
-          )}
-
-          {currentView === 'numerology' && (
-            <motion.section key="num" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              {!numResults ? (
-                <div style={{ minHeight: 'calc(100dvh - 140px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 0.5rem', width: '100%' }}>
-                  {/* Hero Header */}
-                  <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                    <h2 className="primary-gradient-text" style={{ fontSize: '1.5rem', marginBottom: '0.35rem', lineHeight: 1.2, fontWeight: 700, whiteSpace: 'nowrap' }}>Thần Số Học</h2>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.4 }}>Giải mã chỉ số đường đời, sứ mệnh và năng lượng năm cá nhân.</p>
+        <main className="main-container">
+          <AnimatePresence mode="wait">
+            {currentView === 'home' && (
+              <motion.section key="home" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}>
+                <div style={{ minHeight: 'calc(100dvh - 70px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: '1rem' }}>
+                  {/* Hero */}
+                  <div style={{ textAlign: 'center', padding: '0 1rem 1.25rem' }}>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.6, ease: 'easeOut' }}
+                    >
+                      <h1 className="hero-title primary-gradient-text" style={{ marginBottom: '0.5rem' }}>TOMATO</h1>
+                      <p style={{ color: '#555', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500, fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>
+                        Tiềm năng&nbsp;•&nbsp;Duyên số&nbsp;•&nbsp;Trực giác
+                      </p>
+                    </motion.div>
                   </div>
 
-                  <form onSubmit={handleNumerology}>
-                    {/* Name field */}
-                    <div style={{ background: 'rgba(139, 92, 246, 0.06)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: '16px', padding: '1.25rem', marginBottom: '0.75rem' }}>
-                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
-                        Họ và Tên đầy đủ (không dấu)
-                      </label>
-                      <input
-                        type="text"
-                        className="modern-input"
-                        style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', padding: '0.85rem 1rem' }}
-                        placeholder="VD: NGUYEN VAN A"
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      />
+                  {/* Feature Cards */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem', padding: '0 1rem' }}>
+
+                    {/* Card 1 — Thần Số Học */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1, duration: 0.4 }}
+                      onClick={() => setCurrentView('numerology')}
+                      whileTap={{ scale: 0.98 }}
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(139,92,246,0.18) 0%, rgba(99,102,241,0.08) 100%)',
+                        border: '1px solid rgba(139,92,246,0.3)',
+                        borderRadius: '20px', padding: '1.25rem 1.25rem 1.25rem 1.5rem',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem',
+                        position: 'relative', overflow: 'hidden',
+                      }}
+                    >
+                      <div style={{ position: 'absolute', top: '-30px', right: '-20px', width: '100px', height: '100px', background: 'radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                      <div style={{ width: '52px', height: '52px', borderRadius: '16px', background: 'linear-gradient(135deg, #8b5cf6, #6366f1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 15px rgba(139,92,246,0.4)' }}>
+                        <Sparkles size={24} color="#fff" />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#fff', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Thần Số Học</div>
+                        <div style={{ color: '#555', fontSize: '0.76rem', lineHeight: 1.4, fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Giải mã chỉ số đường đời &amp; năng lượng cá nhân</div>
+                      </div>
+                      <ChevronRight size={18} color="rgba(139,92,246,0.8)" style={{ flexShrink: 0 }} />
+                    </motion.div>
+
+                    {/* Card 2 — Bói Bài Tây */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18, duration: 0.4 }}
+                      onClick={() => setCurrentView('western')}
+                      whileTap={{ scale: 0.98 }}
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(96,165,250,0.18) 0%, rgba(59,130,246,0.08) 100%)',
+                        border: '1px solid rgba(96,165,250,0.3)',
+                        borderRadius: '20px', padding: '1.25rem 1.25rem 1.25rem 1.5rem',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem',
+                        position: 'relative', overflow: 'hidden',
+                      }}
+                    >
+                      <div style={{ position: 'absolute', top: '-30px', right: '-20px', width: '100px', height: '100px', background: 'radial-gradient(circle, rgba(96,165,250,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                      <div style={{ width: '52px', height: '52px', borderRadius: '16px', background: 'linear-gradient(135deg, #3b82f6, #60a5fa)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 15px rgba(59,130,246,0.4)' }}>
+                        <Layers size={24} color="#fff" />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#fff', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Bói Bài Tây</div>
+                        <div style={{ color: '#555', fontSize: '0.76rem', lineHeight: 1.4, fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Trải 3 lá bài nhận thông điệp từ vũ trụ</div>
+                      </div>
+                      <ChevronRight size={18} color="rgba(96,165,250,0.8)" style={{ flexShrink: 0 }} />
+                    </motion.div>
+
+                    {/* Card 3 — Tương Hợp */}
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.26, duration: 0.4 }}
+                      onClick={() => setCurrentView('soulmate')}
+                      whileTap={{ scale: 0.98 }}
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(244,63,94,0.18) 0%, rgba(236,72,153,0.08) 100%)',
+                        border: '1px solid rgba(244,63,94,0.3)',
+                        borderRadius: '20px', padding: '1.25rem 1.25rem 1.25rem 1.5rem',
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem',
+                        position: 'relative', overflow: 'hidden',
+                      }}
+                    >
+                      <div style={{ position: 'absolute', top: '-30px', right: '-20px', width: '100px', height: '100px', background: 'radial-gradient(circle, rgba(244,63,94,0.25) 0%, transparent 70%)', pointerEvents: 'none' }} />
+                      <div style={{ width: '52px', height: '52px', borderRadius: '16px', background: 'linear-gradient(135deg, #f43f5e, #ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 15px rgba(244,63,94,0.4)' }}>
+                        <Heart size={24} color="#fff" />
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#fff', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '1px', fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Tương Hợp Tâm Linh</div>
+                        <div style={{ color: '#555', fontSize: '0.76rem', lineHeight: 1.4, fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>AI phân tích nghiệp duyên &amp; cảnh báo tình cảm</div>
+                      </div>
+                      <ChevronRight size={18} color="rgba(244,63,94,0.8)" style={{ flexShrink: 0 }} />
+                    </motion.div>
+
+                  </div>
+
+                  {/* Footer tagline */}
+                  <motion.div
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}
+                    style={{ textAlign: 'center', padding: '1rem 1rem 0', color: 'rgba(255,255,255,0.12)', fontSize: '10px', letterSpacing: '0.05em' }}
+                  >
+                    <span style={{ fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>Powered by AI&nbsp;·&nbsp;Thần số học Pythagoras</span>
+                  </motion.div>
+
+                </div>
+              </motion.section>
+            )}
+
+            {currentView === 'numerology' && (
+              <motion.section key="num" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                {!numResults ? (
+                  <div style={{ minHeight: 'calc(100dvh - 140px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 0.5rem', width: '100%' }}>
+                      {/* Hero Header */}
+                      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                        <h2 className="primary-gradient-text" style={{ fontSize: '1.5rem', marginBottom: '0.35rem', lineHeight: 1.2, fontWeight: 700, whiteSpace: 'nowrap' }}>Thần Số Học</h2>
+                        <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.4 }}>Giải mã chỉ số đường đời, sứ mệnh và năng lượng năm cá nhân.</p>
+                      </div>
+
+                      <form onSubmit={handleNumerology}>
+                        {/* Name field */}
+                        <div style={{ background: 'rgba(139, 92, 246, 0.06)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: '16px', padding: '1.25rem', marginBottom: '0.75rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
+                            Họ và Tên đầy đủ (không dấu)
+                          </label>
+                          <input
+                            type="text"
+                            className="modern-input"
+                            style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', padding: '0.85rem 1rem' }}
+                            placeholder="VD: NGUYEN VAN A"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          />
+                        </div>
+
+                        {/* DOB field */}
+                        <div style={{ background: 'rgba(139, 92, 246, 0.06)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.25rem' }}>
+                          <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
+                            Ngày tháng năm sinh
+                          </label>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.4fr', gap: '0.5rem' }}>
+                            {[
+                              { placeholder: 'Ngày', key: 'day', min: 1, max: 31 },
+                              { placeholder: 'Tháng', key: 'month', min: 1, max: 12 },
+                              { placeholder: 'Năm', key: 'year', min: 1900, max: 2026 },
+                            ].map(({ placeholder, key, min, max }) => (
+                              <input
+                                key={key}
+                                type="number"
+                                placeholder={placeholder}
+                                value={dobParts[key]}
+                                onChange={(e) => setDobParts({ ...dobParts, [key]: e.target.value })}
+                                className="modern-input"
+                                style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', textAlign: 'center', padding: '0.85rem 0.5rem' }}
+                                min={min}
+                                max={max}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        {formError && <p style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '1rem', textAlign: 'center' }}>{formError}</p>}
+
+                        <motion.button
+                          type="submit"
+                          whileTap={{ scale: 0.97 }}
+                          whileHover={{ scale: 1.02 }}
+                          style={{
+                            width: '100%',
+                            padding: '1rem',
+                            background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
+                            border: 'none',
+                            borderRadius: '14px',
+                            color: '#fff',
+                            fontSize: '1rem',
+                            fontWeight: 700,
+                            fontFamily: 'Outfit, sans-serif',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.5rem',
+                            boxShadow: '0 4px 20px rgba(139, 92, 246, 0.4)',
+                            letterSpacing: '0.02em',
+                          }}
+                        >
+                          <Sparkles size={18} /> Phân Tích Ngay
+                        </motion.button>
+                      </form>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="results-container" style={{ maxWidth: '900px', margin: '0 auto', paddingTop: '2rem' }}>
+                    <div className="results-header flex-between">
+                      <h2 className="primary-gradient-text">Kết quả phân tích</h2>
+                      <button onClick={() => setNumResults(null)} className="back-btn">← Nhập lại</button>
                     </div>
 
-                    {/* DOB field */}
-                    <div style={{ background: 'rgba(139, 92, 246, 0.06)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.25rem' }}>
-                      <label style={{ display: 'block', fontSize: '0.7rem', color: 'var(--text-dim)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>
-                        Ngày tháng năm sinh
-                      </label>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.4fr', gap: '0.5rem' }}>
-                        {[
-                          { placeholder: 'Ngày', key: 'day', min: 1, max: 31 },
-                          { placeholder: 'Tháng', key: 'month', min: 1, max: 12 },
-                          { placeholder: 'Năm', key: 'year', min: 1900, max: 2026 },
-                        ].map(({ placeholder, key, min, max }) => (
-                          <input
-                            key={key}
-                            type="number"
-                            placeholder={placeholder}
-                            value={dobParts[key]}
-                            onChange={(e) => setDobParts({...dobParts, [key]: e.target.value})}
-                            className="modern-input"
-                            style={{ background: 'transparent', border: '1px solid rgba(255,255,255,0.12)', textAlign: 'center', padding: '0.85rem 0.5rem' }}
-                            min={min}
-                            max={max}
-                          />
-                        ))}
+                    <div className="grid-4" style={{ marginBottom: '2rem' }}>
+                      <StatBox label="Đường Đời" value={numResults.lp} color="violet" />
+                      <StatBox label="Sứ Mệnh" value={numResults.destiny} color="blue" />
+                      <StatBox label="Linh Hồn" value={numResults.soul} color="indigo" />
+                      <StatBox label="Nhân Cách" value={numResults.personality} color="purple" />
+                    </div>
+
+                    {/* Personal Year UI */}
+                    <div className="glass-container highlight-box" style={{ padding: '1.5rem 2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(30, 58, 138, 0.15) 100%)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
+                      <div>
+                        <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '0.25rem' }}>Năm Cá Nhân {new Date().getFullYear()}</h3>
+                        <p style={{ color: 'var(--text-dim)', fontSize: '0.875rem', margin: 0 }}>Năng lượng chủ đạo bao trùm toàn bộ năm nay của bạn</p>
+                      </div>
+                      <div style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--primary-light)', textShadow: '0 0 20px rgba(139, 92, 246, 0.5)', lineHeight: 1 }}>
+                        {numResults.py}
                       </div>
                     </div>
 
-                    {formError && <p style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '1rem', textAlign: 'center' }}>{formError}</p>}
+                    {/* Birth Chart & Predictions */}
+                    <div className="grid-2-asym" style={{ marginBottom: '2rem', alignItems: 'start', position: 'relative' }}>
 
-                    <motion.button
-                      type="submit"
-                      whileTap={{ scale: 0.97 }}
-                      whileHover={{ scale: 1.02 }}
-                      style={{
-                        width: '100%',
-                        padding: '1rem',
-                        background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
-                        border: 'none',
-                        borderRadius: '14px',
-                        color: '#fff',
-                        fontSize: '1rem',
-                        fontWeight: 700,
-                        fontFamily: 'Outfit, sans-serif',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.5rem',
-                        boxShadow: '0 4px 20px rgba(139, 92, 246, 0.4)',
-                        letterSpacing: '0.02em',
-                      }}
-                    >
-                      <Sparkles size={18} /> Phân Tích Ngay
-                    </motion.button>
-                  </form>
-                </div>
-                </div>
-              ) : (
-                <div className="results-container" style={{ maxWidth: '900px', margin: '0 auto', paddingTop: '2rem' }}>
-                  <div className="results-header flex-between">
-                    <h2 className="primary-gradient-text">Kết quả phân tích</h2>
-                    <button onClick={() => setNumResults(null)} className="back-btn">← Nhập lại</button>
-                  </div>
+                      {/* Ambient Center Void Filler */}
+                      <div style={{
+                        position: 'absolute', top: '50%', left: '35%', transform: 'translate(-50%, -50%)',
+                        width: '500px', height: '500px',
+                        background: 'radial-gradient(circle, rgba(236,72,153,0.1) 0%, rgba(139,92,246,0.1) 40%, transparent 70%)',
+                        filter: 'blur(60px)', pointerEvents: 'none', zIndex: -1
+                      }} />
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
+                        style={{ position: 'absolute', top: '50%', left: '35%', width: '100%', height: '100%', pointerEvents: 'none', zIndex: -1, opacity: 0.5, backgroundImage: 'radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.8), rgba(0,0,0,0)), radial-gradient(1px 1px at 80px 100px, rgba(255, 255, 255, 0.6), rgba(0,0,0,0))', backgroundSize: '150px 150px' }}
+                      />
+                      {/* Birth Chart */}
+                      <div className="glass-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: 0 }}>
+                        <h3 style={{ fontSize: '1.125rem', color: '#fff', marginBottom: '0.5rem' }}>Biểu đồ Chòm sao</h3>
+                        <p style={{ color: 'var(--text-dim)', fontSize: '0.875rem', marginBottom: '1.5rem', textAlign: 'center' }}>Các năng lượng bẩm sinh trên lưới Pythagoras</p>
+                        <BirthChart dob={numResults.dob} />
+                      </div>
 
-                  <div className="grid-4" style={{ marginBottom: '2rem' }}>
-                    <StatBox label="Đường Đời" value={numResults.lp} color="violet" />
-                    <StatBox label="Sứ Mệnh" value={numResults.destiny} color="blue" />
-                    <StatBox label="Linh Hồn" value={numResults.soul} color="indigo" />
-                    <StatBox label="Nhân Cách" value={numResults.personality} color="purple" />
-                  </div>
-                  
-                  {/* Personal Year UI */}
-                  <div className="glass-container highlight-box" style={{ padding: '1.5rem 2rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(30, 58, 138, 0.15) 100%)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
-                    <div>
-                      <h3 style={{ fontSize: '1.25rem', color: '#fff', marginBottom: '0.25rem' }}>Năm Cá Nhân {new Date().getFullYear()}</h3>
-                      <p style={{ color: 'var(--text-dim)', fontSize: '0.875rem', margin: 0 }}>Năng lượng chủ đạo bao trùm toàn bộ năm nay của bạn</p>
-                    </div>
-                    <div style={{ fontSize: '3.5rem', fontWeight: 800, color: 'var(--primary-light)', textShadow: '0 0 20px rgba(139, 92, 246, 0.5)', lineHeight: 1 }}>
-                      {numResults.py}
-                    </div>
-                  </div>
+                      {/* Monthly Predictions */}
+                      <div className="glass-container" style={{ margin: 0 }}>
+                        <h3 style={{ fontSize: '1.125rem', color: '#fff', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <Star size={18} color="var(--primary-light)" /> Tháng Đỉnh Cao Năng Lượng
+                        </h3>
+                        {numLoading ? (
+                          <div className="ai-loading" style={{ margin: '2rem 0' }}>
+                            <Loader2 className="loader-spin" size={24} />
+                            <span className="ai-loading-text">AI đang tính toán các đỉnh năng lượng...</span>
+                          </div>
+                        ) : monthlyPredictions ? (
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {/* 12-Month Timeline */}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', position: 'relative', padding: '0 0.5rem' }}>
+                              <div style={{ position: 'absolute', top: '6px', left: '0.5rem', right: '0.5rem', height: '2px', background: 'rgba(255,255,255,0.05)', zIndex: 0 }} />
+                              <div style={{ position: 'absolute', top: '6px', left: '0.5rem', width: `${((new Date().getMonth()) / 11) * 100}%`, height: '2px', background: 'linear-gradient(90deg, var(--primary-light), #ec4899)', zIndex: 0 }} />
+                              {Array.from({ length: 12 }).map((_, i) => {
+                                const month = i + 1;
+                                const currentMonth = new Date().getMonth() + 1;
+                                const isCurrent = month === currentMonth;
+                                return (
+                                  <div key={month} style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                                    {isCurrent ? (
+                                      <motion.div
+                                        animate={{ boxShadow: ['0 0 0px #ec4899', '0 0 15px #ec4899', '0 0 0px #ec4899'] }}
+                                        transition={{ duration: 2, repeat: Infinity }}
+                                        style={{ width: '14px', height: '14px', borderRadius: '50%', background: '#ec4899', border: '2px solid #fff' }}
+                                      />
+                                    ) : (
+                                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: month < currentMonth ? '#ec4899' : 'rgba(255,255,255,0.1)', marginTop: '3px' }} />
+                                    )}
+                                    <span style={{ fontSize: '0.6rem', color: isCurrent ? '#fff' : (month < currentMonth ? 'rgba(255,255,255,0.5)' : 'var(--text-dim)'), fontWeight: isCurrent ? 700 : 400 }}>
+                                      T{month}
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
 
-                  {/* Birth Chart & Predictions */}
-                  <div className="grid-2-asym" style={{ marginBottom: '2rem', alignItems: 'start', position: 'relative' }}>
-                    
-                    {/* Ambient Center Void Filler */}
-                    <div style={{
-                      position: 'absolute', top: '50%', left: '35%', transform: 'translate(-50%, -50%)',
-                      width: '500px', height: '500px', 
-                      background: 'radial-gradient(circle, rgba(236,72,153,0.1) 0%, rgba(139,92,246,0.1) 40%, transparent 70%)',
-                      filter: 'blur(60px)', pointerEvents: 'none', zIndex: -1
-                    }} />
-                    <motion.div 
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
-                      style={{ position: 'absolute', top: '50%', left: '35%', width: '100%', height: '100%', pointerEvents: 'none', zIndex: -1, opacity: 0.5, backgroundImage: 'radial-gradient(1px 1px at 20px 30px, rgba(255, 255, 255, 0.8), rgba(0,0,0,0)), radial-gradient(1px 1px at 80px 100px, rgba(255, 255, 255, 0.6), rgba(0,0,0,0))', backgroundSize: '150px 150px' }}
-                    />
-                    {/* Birth Chart */}
-                    <div className="glass-container" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: 0 }}>
-                      <h3 style={{ fontSize: '1.125rem', color: '#fff', marginBottom: '0.5rem' }}>Biểu đồ Chòm sao</h3>
-                      <p style={{ color: 'var(--text-dim)', fontSize: '0.875rem', marginBottom: '1.5rem', textAlign: 'center' }}>Các năng lượng bẩm sinh trên lưới Pythagoras</p>
-                      <BirthChart dob={numResults.dob} />
-                    </div>
-
-                    {/* Monthly Predictions */}
-                    <div className="glass-container" style={{ margin: 0 }}>
-                      <h3 style={{ fontSize: '1.125rem', color: '#fff', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <Star size={18} color="var(--primary-light)" /> Tháng Đỉnh Cao Năng Lượng
-                      </h3>
-                      {numLoading ? (
-                        <div className="ai-loading" style={{ margin: '2rem 0' }}>
-                          <Loader2 className="loader-spin" size={24} />
-                          <span className="ai-loading-text">AI đang tính toán các đỉnh năng lượng...</span>
-                        </div>
-                      ) : monthlyPredictions ? (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                          {/* 12-Month Timeline */}
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', position: 'relative', padding: '0 0.5rem' }}>
-                            <div style={{ position: 'absolute', top: '6px', left: '0.5rem', right: '0.5rem', height: '2px', background: 'rgba(255,255,255,0.05)', zIndex: 0 }} />
-                            <div style={{ position: 'absolute', top: '6px', left: '0.5rem', width: `${((new Date().getMonth()) / 11) * 100}%`, height: '2px', background: 'linear-gradient(90deg, var(--primary-light), #ec4899)', zIndex: 0 }} />
-                            {Array.from({ length: 12 }).map((_, i) => {
-                              const month = i + 1;
-                              const currentMonth = new Date().getMonth() + 1;
-                              const isCurrent = month === currentMonth;
+                            {monthlyPredictions.map((pred, i) => {
+                              const Icon = i === 0 ? Briefcase : i === 1 ? Coins : Heart;
+                              const color = i === 0 ? '#60a5fa' : i === 1 ? '#fcd34d' : '#f43f5e';
                               return (
-                                <div key={month} style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                                  {isCurrent ? (
-                                    <motion.div 
-                                      animate={{ boxShadow: ['0 0 0px #ec4899', '0 0 15px #ec4899', '0 0 0px #ec4899'] }}
-                                      transition={{ duration: 2, repeat: Infinity }}
-                                      style={{ width: '14px', height: '14px', borderRadius: '50%', background: '#ec4899', border: '2px solid #fff' }}
-                                    />
-                                  ) : (
-                                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: month < currentMonth ? '#ec4899' : 'rgba(255,255,255,0.1)', marginTop: '3px' }} />
-                                  )}
-                                  <span style={{ fontSize: '0.6rem', color: isCurrent ? '#fff' : (month < currentMonth ? 'rgba(255,255,255,0.5)' : 'var(--text-dim)'), fontWeight: isCurrent ? 700 : 400 }}>
-                                    T{month}
-                                  </span>
+                                <div key={i} style={{ background: 'rgba(255,255,255,0.03)', padding: '1.25rem', borderRadius: '12px', borderLeft: `4px solid ${color}`, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                    <div style={{ background: `${color}20`, padding: '0.5rem', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                      <Icon size={20} color={color} />
+                                    </div>
+                                    <span style={{ fontWeight: 600, color: '#fff', fontSize: '1.05rem', lineHeight: 1.3 }}>
+                                      {pred.title}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span style={{
+                                      display: 'inline-block',
+                                      whiteSpace: 'nowrap',
+                                      fontSize: '0.85rem',
+                                      background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(236, 72, 153, 0.8))',
+                                      color: '#fff',
+                                      padding: '0.35rem 1rem',
+                                      borderRadius: '20px',
+                                      fontWeight: 700,
+                                      boxShadow: '0 4px 15px rgba(236, 72, 153, 0.25)',
+                                      letterSpacing: '0.02em'
+                                    }}>
+                                      {pred.months}
+                                    </span>
+                                  </div>
+                                  <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.6 }}>{pred.desc}</p>
                                 </div>
                               );
                             })}
                           </div>
-
-                          {monthlyPredictions.map((pred, i) => {
-                            const Icon = i === 0 ? Briefcase : i === 1 ? Coins : Heart;
-                            const color = i === 0 ? '#60a5fa' : i === 1 ? '#fcd34d' : '#f43f5e';
-                            return (
-                              <div key={i} style={{ background: 'rgba(255,255,255,0.03)', padding: '1.25rem', borderRadius: '12px', borderLeft: `4px solid ${color}`, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                                  <div style={{ background: `${color}20`, padding: '0.5rem', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Icon size={20} color={color} />
-                                  </div>
-                                  <span style={{ fontWeight: 600, color: '#fff', fontSize: '1.05rem', lineHeight: 1.3 }}>
-                                    {pred.title}
-                                  </span>
-                                </div>
-                                <div>
-                                  <span style={{ 
-                                    display: 'inline-block',
-                                    whiteSpace: 'nowrap',
-                                    fontSize: '0.85rem', 
-                                    background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(236, 72, 153, 0.8))', 
-                                    color: '#fff', 
-                                    padding: '0.35rem 1rem', 
-                                    borderRadius: '20px', 
-                                    fontWeight: 700,
-                                    boxShadow: '0 4px 15px rgba(236, 72, 153, 0.25)',
-                                    letterSpacing: '0.02em'
-                                  }}>
-                                    {pred.months}
-                                  </span>
-                                </div>
-                                <p style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.6 }}>{pred.desc}</p>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <p style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>Không thể dự đoán vào lúc này.</p>
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="report-section">
-                    <ReportCard title="Chỉ số Đường Đời" text={numResults.detailed.lpText} loading={numLoading} />
-                    <ReportCard title="Chỉ số Sứ Mệnh" text={numResults.detailed.destinyText} loading={numLoading} />
-                  </div>
-
-                  <AIWisdomSection loading={aiLoading} chatHistory={chatHistory} onAsk={() => askAI('numerology')} onSendQuestion={(q) => handleSendQuestion('numerology', q)} isAIPaid={isAIPaid} onRequestPayment={openPaywall} />
-                </div>
-              )}
-            </motion.section>
-          )}
-
-          {currentView === 'soulmate' && (
-            <SoulmateSection
-              form={soulmateForm}
-              setForm={setSoulmateForm}
-              result={soulmateResult}
-              setResult={setSoulmateResult}
-              loading={soulmateLoading}
-              setLoading={setSoulmateLoading}
-              error={soulmateError}
-              setError={setSoulmateError}
-            />
-          )}
-
-          {currentView === 'western' && (
-            <motion.section key="western" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              {westernStep === 1 && (
-                <div style={{ minHeight: 'calc(100dvh - 140px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <div style={{ maxWidth: '520px', margin: '0 auto', padding: '0 0.5rem', width: '100%' }}>
-                  <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                    <h2 className="primary-gradient-text" style={{ fontSize: '1.5rem', marginBottom: '0.35rem', lineHeight: 1.2, fontWeight: 700, whiteSpace: 'nowrap' }}>Bói Bài Tây</h2>
-                    <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.4 }}>Trải 3 lá bài, nhận thông điệp từ vũ trụ.</p>
-                  </div>
-                  <div className="western-setup-grid">
-                    <div className="setup-panel">
-                      <SelectionGroup label="Giới tính" options={['Nam', 'Nữ']} value={westernConfig.gender} onChange={(v) => setWesternConfig({...westernConfig, gender: v, shuffleGoal: v === 'Nam' ? 7 : 9})} />
-                      <CustomSelect 
-                        label="Chủ đề muốn hỏi" 
-                        options={['Tình cảm', 'Sự nghiệp', 'Tương lai', 'Tiền bạc']} 
-                        value={westernConfig.category} 
-                        onChange={(v) => setWesternConfig({...westernConfig, category: v})} 
-                      />
-                    </div>
-                    <div className="setup-instructions">
-                      <p style={{ color: 'var(--text-dim)', lineHeight: 1.6, fontSize: '0.9rem', textAlign: 'center' }}>
-                        Giữ tâm trí tĩnh lặng, tập trung vào câu hỏi về chủ đề <strong style={{ color: '#fff' }}>{westernConfig.category}</strong>.
-                      </p>
-                      <motion.button
-                        onClick={() => setWesternStep(2)}
-                        whileTap={{ scale: 0.97 }}
-                        whileHover={{ scale: 1.02 }}
-                        style={{
-                          width: '100%',
-                          padding: '1rem',
-                          background: 'linear-gradient(135deg, #3b82f6, #6366f1)',
-                          border: 'none',
-                          borderRadius: '14px',
-                          color: '#fff',
-                          fontSize: '1rem',
-                          fontWeight: 700,
-                          fontFamily: 'Outfit, sans-serif',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: '0.5rem',
-                          boxShadow: '0 4px 20px rgba(59, 130, 246, 0.35)',
-                        }}
-                      >
-                        <Layers size={18} /> Bắt đầu trải bài
-                      </motion.button>
-                    </div>
-                  </div>
-                </div>
-                </div>
-              )}
-
-              {westernStep === 2 && (
-                <div className="glass-container centered">
-                  <h2 className="primary-gradient-text" style={{ fontSize: '1.75rem', marginBottom: '3rem' }}>Đang xào bài ({shuffleCount}/{westernConfig.shuffleGoal})</h2>
-                  <div className="shuffling-stage">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <motion.div 
-                        key={i} 
-                        animate={isShuffling ? { 
-                          x: i % 2 === 0 ? [0, -150, 0] : [0, 150, 0], 
-                          y: [0, -30, 0],
-                          rotateZ: i % 2 === 0 ? [0, -20, 0] : [0, 20, 0],
-                          rotateY: i % 2 === 0 ? [0, 60, 0] : [0, -60, 0],
-                          scale: [1, 1.05, 1]
-                        } : { x: 0, y: -i * 2, rotateZ: 0, rotateY: 0, scale: 1 }} 
-                        transition={{ duration: 0.5, ease: "circInOut" }} 
-                        className="shuffle-card" 
-                        style={{ zIndex: isShuffling ? (i % 2 === 0 ? 50 + i : 50 - i) : 100 - i }}
-                      >
-                        <div className="shuffle-card-inner" />
-                      </motion.div>
-                    ))}
-                  </div>
-                  <ModernButton onClick={handleShuffle} disabled={isShuffling || shuffleCount >= westernConfig.shuffleGoal}>
-                    {isShuffling ? 'Đang trộn...' : (shuffleCount >= westernConfig.shuffleGoal ? 'Hoàn tất' : 'Xào bài')}
-                  </ModernButton>
-                </div>
-              )}
-
-              {westernStep === 3 && (
-                <div className="glass-container centered" style={{ maxWidth: '1050px' }}>
-                  <h2 className="primary-gradient-text" style={{ fontSize: '1.75rem', marginBottom: '1rem' }}>Chọn Bài</h2>
-                  <p style={{ color: 'var(--text-dim)', marginBottom: '3rem' }}>Hãy lắng nghe trực giác và chọn 3 lá bài ({selectedCardIndices.length}/3)</p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
-                    {shuffledDeck.map((card, index) => {
-                      const isSelected = selectedCardIndices.includes(index);
-                      return (
-                        <motion.div 
-                          key={index} 
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1, y: isSelected ? -15 : 0 }}
-                          whileHover={!isSelected ? { y: -10, boxShadow: '0 5px 15px rgba(139, 92, 246, 0.3)' } : {}}
-                          onClick={() => handleSelectCard(index)} 
-                          style={{
-                            width: '55px', height: '82px',
-                            border: isSelected ? '2px solid var(--primary-light)' : '1px solid rgba(255,255,255,0.2)',
-                            background: isSelected ? 'rgba(139, 92, 246, 0.2)' : 'linear-gradient(135deg, #1e1e38 0%, #151528 100%)',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            transition: 'all 0.3s',
-                            position: 'relative',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          <div style={{
-                            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M8 0l2 6L16 8l-6 2L8 16l-2-6L0 8l6-2L8 0z\' fill=\'rgba(255,255,255,0.05)\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
-                            backgroundSize: '16px 16px',
-                            opacity: isSelected ? 0 : 1
-                          }} />
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {westernStep === 4 && (
-                <div className="result-display">
-                  <div className="cards-stage">
-                    <div className="fan-spread" style={{ width: fanWidth, height: fanHeight }}>
-                      {finalCards.map((card, i) => (
-                        <motion.div 
-                          key={i} 
-                          initial={{ opacity: 0, y: 50, scale: 0.9 }} 
-                          animate={{ opacity: 1, y: i * 20, x: (i - 1) * spreadDistance, rotate: (i - 1) * 10, scale: 1 }} 
-                          transition={{ delay: i * 0.2, type: "spring" }}
-                          className="fan-card-item"
-                        >
-                          <PremiumCard card={card} />
-                        </motion.div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="analysis-scroller">
-                    <div style={{ marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
-                      <div>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '0.5rem' }}>Chủ đề</p>
-                        <h2 className="primary-gradient-text" style={{ fontSize: '2rem', fontWeight: 700 }}>{westernConfig.category}</h2>
+                        ) : (
+                          <p style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>Không thể dự đoán vào lúc này.</p>
+                        )}
                       </div>
-                      <button onClick={resetWesternReading} className="back-btn">← Trải bài mới</button>
                     </div>
-                    
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
-                      {finalCards.map((card, i) => (
-                        <div key={i} className="report-card" style={{ marginBottom: 0 }}>
-                          <div className="title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(139, 92, 246, 0.2)', color: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>{i+1}</span>
-                            {card.rank} {card.suit} {card.isReversed ? '(Ngược)' : ''}
-                          </div>
-                          {loadingCards ? (
-                            <div className="ai-loading" style={{ margin: '1rem 0' }}>
-                              <Loader2 className="loader-spin" size={16} />
-                              <span className="ai-loading-text" style={{ fontSize: '0.875rem' }}>AI đang giải mã ý nghĩa lá bài theo chủ đề {westernConfig.category}...</span>
-                            </div>
-                          ) : (
-                            <p className="text">"{aiCardMeanings[i] || (card.isReversed && card.meaningReversed ? card.meaningReversed : (card.meaningUpright || card.meaning))}"</p>
-                          )}
+
+                    <div className="report-section">
+                      <ReportCard title="Chỉ số Đường Đời" text={numResults.detailed.lpText} loading={numLoading} />
+                      <ReportCard title="Chỉ số Sứ Mệnh" text={numResults.detailed.destinyText} loading={numLoading} />
+                    </div>
+
+                    <AIWisdomSection loading={aiLoading} chatHistory={chatHistory} onAsk={() => askAI('numerology')} onSendQuestion={(q) => handleSendQuestion('numerology', q)} isAIPaid={isAIPaid} onRequestPayment={openPaywall} />
+                  </div>
+                )}
+              </motion.section>
+            )}
+
+            {currentView === 'soulmate' && (
+              <SoulmateSection
+                form={soulmateForm}
+                setForm={setSoulmateForm}
+                result={soulmateResult}
+                setResult={setSoulmateResult}
+                loading={soulmateLoading}
+                setLoading={setSoulmateLoading}
+                error={soulmateError}
+                setError={setSoulmateError}
+              />
+            )}
+
+            {currentView === 'western' && (
+              <motion.section key="western" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+                {westernStep === 1 && (
+                  <div style={{ minHeight: 'calc(100dvh - 140px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div style={{ maxWidth: '520px', margin: '0 auto', padding: '0 0.5rem', width: '100%' }}>
+                      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+                        <h2 className="primary-gradient-text" style={{ fontSize: '1.5rem', marginBottom: '0.35rem', lineHeight: 1.2, fontWeight: 700, whiteSpace: 'nowrap' }}>Bói Bài Tây</h2>
+                        <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.4 }}>Trải 3 lá bài, nhận thông điệp từ vũ trụ.</p>
+                      </div>
+                      <div className="western-setup-grid">
+                        <div className="setup-panel">
+                          <SelectionGroup label="Giới tính" options={['Nam', 'Nữ']} value={westernConfig.gender} onChange={(v) => setWesternConfig({ ...westernConfig, gender: v, shuffleGoal: v === 'Nam' ? 7 : 9 })} />
+                          <CustomSelect
+                            label="Chủ đề muốn hỏi"
+                            options={['Tình cảm', 'Sự nghiệp', 'Tương lai', 'Tiền bạc']}
+                            value={westernConfig.category}
+                            onChange={(v) => setWesternConfig({ ...westernConfig, category: v })}
+                          />
                         </div>
+                        <div className="setup-instructions">
+                          <p style={{ color: 'var(--text-dim)', lineHeight: 1.6, fontSize: '0.9rem', textAlign: 'center' }}>
+                            Giữ tâm trí tĩnh lặng, tập trung vào câu hỏi về chủ đề <strong style={{ color: '#fff' }}>{westernConfig.category}</strong>.
+                          </p>
+                          <motion.button
+                            onClick={() => setWesternStep(2)}
+                            whileTap={{ scale: 0.97 }}
+                            whileHover={{ scale: 1.02 }}
+                            style={{
+                              width: '100%',
+                              padding: '1rem',
+                              background: 'linear-gradient(135deg, #3b82f6, #6366f1)',
+                              border: 'none',
+                              borderRadius: '14px',
+                              color: '#fff',
+                              fontSize: '1rem',
+                              fontWeight: 700,
+                              fontFamily: 'Outfit, sans-serif',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '0.5rem',
+                              boxShadow: '0 4px 20px rgba(59, 130, 246, 0.35)',
+                            }}
+                          >
+                            <Layers size={18} /> Bắt đầu trải bài
+                          </motion.button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {westernStep === 2 && (
+                  <div className="glass-container centered">
+                    <h2 className="primary-gradient-text" style={{ fontSize: '1.75rem', marginBottom: '3rem' }}>Đang xào bài ({shuffleCount}/{westernConfig.shuffleGoal})</h2>
+                    <div className="shuffling-stage">
+                      {Array.from({ length: 8 }).map((_, i) => (
+                        <motion.div
+                          key={i}
+                          animate={isShuffling ? {
+                            x: i % 2 === 0 ? [0, -150, 0] : [0, 150, 0],
+                            y: [0, -30, 0],
+                            rotateZ: i % 2 === 0 ? [0, -20, 0] : [0, 20, 0],
+                            rotateY: i % 2 === 0 ? [0, 60, 0] : [0, -60, 0],
+                            scale: [1, 1.05, 1]
+                          } : { x: 0, y: -i * 2, rotateZ: 0, rotateY: 0, scale: 1 }}
+                          transition={{ duration: 0.5, ease: "circInOut" }}
+                          className="shuffle-card"
+                          style={{ zIndex: isShuffling ? (i % 2 === 0 ? 50 + i : 50 - i) : 100 - i }}
+                        >
+                          <div className="shuffle-card-inner" />
+                        </motion.div>
                       ))}
                     </div>
-                    
-                    <AIWisdomSection loading={aiLoading} chatHistory={chatHistory} onAsk={() => askAI('western')} onSendQuestion={(q) => handleSendQuestion('western', q)} isAIPaid={isAIPaid} onRequestPayment={openPaywall} />
+                    <ModernButton onClick={handleShuffle} disabled={isShuffling || shuffleCount >= westernConfig.shuffleGoal}>
+                      {isShuffling ? 'Đang trộn...' : (shuffleCount >= westernConfig.shuffleGoal ? 'Hoàn tất' : 'Xào bài')}
+                    </ModernButton>
                   </div>
-                </div>
-              )}
-            </motion.section>
-          )}
-        </AnimatePresence>
-      </main>
-    </div>
+                )}
+
+                {westernStep === 3 && (
+                  <div className="glass-container centered" style={{ maxWidth: '1050px' }}>
+                    <h2 className="primary-gradient-text" style={{ fontSize: '1.75rem', marginBottom: '1rem' }}>Chọn Bài</h2>
+                    <p style={{ color: 'var(--text-dim)', marginBottom: '3rem' }}>Hãy lắng nghe trực giác và chọn 3 lá bài ({selectedCardIndices.length}/3)</p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+                      {shuffledDeck.map((card, index) => {
+                        const isSelected = selectedCardIndices.includes(index);
+                        return (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1, y: isSelected ? -15 : 0 }}
+                            whileHover={!isSelected ? { y: -10, boxShadow: '0 5px 15px rgba(139, 92, 246, 0.3)' } : {}}
+                            onClick={() => handleSelectCard(index)}
+                            style={{
+                              width: '55px', height: '82px',
+                              border: isSelected ? '2px solid var(--primary-light)' : '1px solid rgba(255,255,255,0.2)',
+                              background: isSelected ? 'rgba(139, 92, 246, 0.2)' : 'linear-gradient(135deg, #1e1e38 0%, #151528 100%)',
+                              borderRadius: '6px',
+                              cursor: 'pointer',
+                              transition: 'all 0.3s',
+                              position: 'relative',
+                              overflow: 'hidden'
+                            }}
+                          >
+                            <div style={{
+                              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+                              backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M8 0l2 6L16 8l-6 2L8 16l-2-6L0 8l6-2L8 0z\' fill=\'rgba(255,255,255,0.05)\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
+                              backgroundSize: '16px 16px',
+                              opacity: isSelected ? 0 : 1
+                            }} />
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {westernStep === 4 && (
+                  <div className="result-display">
+                    <div className="cards-stage">
+                      <div className="fan-spread" style={{ width: fanWidth, height: fanHeight }}>
+                        {finalCards.map((card, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                            animate={{ opacity: 1, y: i * 20, x: (i - 1) * spreadDistance, rotate: (i - 1) * 10, scale: 1 }}
+                            transition={{ delay: i * 0.2, type: "spring" }}
+                            className="fan-card-item"
+                          >
+                            <PremiumCard card={card} />
+                          </motion.div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="analysis-scroller">
+                      <div style={{ marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                        <div>
+                          <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '0.5rem' }}>Chủ đề</p>
+                          <h2 className="primary-gradient-text" style={{ fontSize: '2rem', fontWeight: 700 }}>{westernConfig.category}</h2>
+                        </div>
+                        <button onClick={resetWesternReading} className="back-btn">← Trải bài mới</button>
+                      </div>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                        {finalCards.map((card, i) => (
+                          <div key={i} className="report-card" style={{ marginBottom: 0 }}>
+                            <div className="title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'rgba(139, 92, 246, 0.2)', color: 'var(--primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>{i + 1}</span>
+                              {card.rank} {card.suit} {card.isReversed ? '(Ngược)' : ''}
+                            </div>
+                            {loadingCards ? (
+                              <div className="ai-loading" style={{ margin: '1rem 0' }}>
+                                <Loader2 className="loader-spin" size={16} />
+                                <span className="ai-loading-text" style={{ fontSize: '0.875rem' }}>AI đang giải mã ý nghĩa lá bài theo chủ đề {westernConfig.category}...</span>
+                              </div>
+                            ) : (
+                              <p className="text">"{aiCardMeanings[i] || (card.isReversed && card.meaningReversed ? card.meaningReversed : (card.meaningUpright || card.meaning))}"</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      <AIWisdomSection loading={aiLoading} chatHistory={chatHistory} onAsk={() => askAI('western')} onSendQuestion={(q) => handleSendQuestion('western', q)} isAIPaid={isAIPaid} onRequestPayment={openPaywall} />
+                    </div>
+                  </div>
+                )}
+              </motion.section>
+            )}
+          </AnimatePresence>
+        </main>
+      </div>
 
       {/* ── App-level Paywall Modal ── */}
       <AnimatePresence>
@@ -913,8 +913,8 @@ const App = () => {
               {payStatus === 'qr' && (<>
                 <div style={{ fontWeight: 700, color: '#fff', fontSize: '1.1rem' }}>Quét QR để thanh toán</div>
                 {qrUrl
-                  ? <img src={qrUrl} alt="QR" style={{ width: '200px', height: '200px', borderRadius: '12px', border: '2px solid rgba(139,92,246,0.4)' }} />
-                  : <div style={{ width: '200px', height: '200px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.4)', fontSize: '0.78rem', padding: '1rem' }}>Không tải được QR.<br/>Chuyển khoản thủ công với nội dung bên dưới.</div>
+                  ? <img src={qrUrl} alt="QR" style={{ width: '240px', height: 'auto', borderRadius: '12px', border: '2px solid rgba(139,92,246,0.4)', background: '#fff' }} />
+                  : <div style={{ width: '240px', height: '240px', borderRadius: '12px', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.4)', fontSize: '0.78rem', padding: '1rem', textAlign: 'center' }}>Không tải được QR.<br />Chuyển khoản thủ công với nội dung bên dưới.</div>
                 }
                 <div style={{ background: 'rgba(139,92,246,0.15)', borderRadius: '10px', padding: '0.6rem 1rem', width: '100%' }}>
                   <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.68rem', marginBottom: '0.2rem' }}>Nội dung chuyển khoản</div>
@@ -1060,10 +1060,10 @@ const AIWisdomSection = ({ loading, chatHistory, onAsk, onSendQuestion, isAIPaid
 
       {chatHistory.length > 0 && !loading && (
         <div className="chat-input-wrapper">
-          <input 
-            type="text" 
-            className="chat-input" 
-            placeholder="Hỏi thêm trợ lý AI..." 
+          <input
+            type="text"
+            className="chat-input"
+            placeholder="Hỏi thêm trợ lý AI..."
             value={questionInput}
             onChange={(e) => setQuestionInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -1161,7 +1161,7 @@ const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading
     const month = parseInt(parts[1]);
     const year = parseInt(parts[2]);
     if (!day || !month || !year) return null;
-    return { isoStr: `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}` };
+    return { isoStr: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}` };
   };
 
   const handleAnalyze = async (e) => {
@@ -1288,79 +1288,79 @@ const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading
   return (
     <motion.section key="soulmate-form" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
       <div style={{ minHeight: 'calc(100dvh - 140px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-      <div style={{ maxWidth: '440px', margin: '0 auto', padding: '0 1rem', width: '100%' }}>
+        <div style={{ maxWidth: '440px', margin: '0 auto', padding: '0 1rem', width: '100%' }}>
 
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <h2 className="primary-gradient-text" style={{ fontSize: '1.5rem', marginBottom: '0.35rem', lineHeight: 1.2, fontWeight: 700, whiteSpace: 'nowrap' }}>Tương Hợp Tâm Linh</h2>
-          <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.4 }}>AI phân tích nghiệp duyên &amp; cảnh báo tình cảm.</p>
-        </div>
-
-        <form onSubmit={handleAnalyze}>
-          {/* Single unified card */}
-          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', overflow: 'hidden', marginBottom: '1rem' }}>
-
-            {/* Person 1 */}
-            <div style={{ padding: '1.25rem 1.25rem 1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.875rem' }}>
-                <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'linear-gradient(135deg, #8b5cf6, #a78bfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>1</div>
-                <span style={{ color: 'var(--primary-light)', fontWeight: 600, fontSize: '0.875rem' }}>Người thứ nhất</span>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <input className="modern-input" style={{ background: 'rgba(0,0,0,0.25)' }} placeholder="Họ và tên (không dấu)" value={form.name1} onChange={e => setForm({ ...form, name1: e.target.value })} />
-                </div>
-                <div style={{ gridColumn: '1 / -1' }}>
-                  <input className="modern-input" style={{ background: 'rgba(0,0,0,0.25)' }} placeholder="Ngày sinh  dd/mm/yyyy" value={form.dob1} onChange={e => setForm({ ...form, dob1: e.target.value })} />
-                </div>
-              </div>
-            </div>
-
-            {/* Divider */}
-            <div style={{ display: 'flex', alignItems: 'center', padding: '0 1.25rem', gap: '0.75rem' }}>
-              <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.4))' }} />
-              <motion.div
-                animate={{ scale: [0.9, 1.2, 0.9] }}
-                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-                style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', boxShadow: '0 0 12px rgba(236,72,153,0.4)', flexShrink: 0 }}
-              >❤️</motion.div>
-              <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(244,63,94,0.4), transparent)' }} />
-            </div>
-
-            {/* Person 2 */}
-            <div style={{ padding: '1rem 1.25rem 1.25rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.875rem' }}>
-                <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'linear-gradient(135deg, #f43f5e, #fb7185)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>2</div>
-                <span style={{ color: '#fb7185', fontWeight: 600, fontSize: '0.875rem' }}>Người thứ hai</span>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-                <input className="modern-input" style={{ background: 'rgba(0,0,0,0.25)' }} placeholder="Họ và tên (không dấu)" value={form.name2} onChange={e => setForm({ ...form, name2: e.target.value })} />
-                <input className="modern-input" style={{ background: 'rgba(0,0,0,0.25)' }} placeholder="Ngày sinh  dd/mm/yyyy" value={form.dob2} onChange={e => setForm({ ...form, dob2: e.target.value })} />
-              </div>
-            </div>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
+            <h2 className="primary-gradient-text" style={{ fontSize: '1.5rem', marginBottom: '0.35rem', lineHeight: 1.2, fontWeight: 700, whiteSpace: 'nowrap' }}>Tương Hợp Tâm Linh</h2>
+            <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.4 }}>AI phân tích nghiệp duyên &amp; cảnh báo tình cảm.</p>
           </div>
 
-          {error && <p style={{ color: '#ef4444', fontSize: '0.825rem', marginBottom: '0.75rem', textAlign: 'center' }}>{error}</p>}
+          <form onSubmit={handleAnalyze}>
+            {/* Single unified card */}
+            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '20px', overflow: 'hidden', marginBottom: '1rem' }}>
 
-          <motion.button
-            type="submit"
-            whileTap={{ scale: 0.97 }}
-            whileHover={{ scale: 1.02 }}
-            style={{
-              width: '100%', padding: '1rem',
-              background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
-              border: 'none', borderRadius: '14px', color: '#fff',
-              fontSize: '1rem', fontWeight: 700, fontFamily: 'Outfit, sans-serif',
-              cursor: 'pointer', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', gap: '0.5rem',
-              boxShadow: '0 4px 20px rgba(236, 72, 153, 0.35)',
-            }}
-          >
-            <Heart size={18} fill="#fff" /> Phân tích duyên số
-          </motion.button>
-        </form>
+              {/* Person 1 */}
+              <div style={{ padding: '1.25rem 1.25rem 1rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.875rem' }}>
+                  <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'linear-gradient(135deg, #8b5cf6, #a78bfa)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>1</div>
+                  <span style={{ color: 'var(--primary-light)', fontWeight: 600, fontSize: '0.875rem' }}>Người thứ nhất</span>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <input className="modern-input" style={{ background: 'rgba(0,0,0,0.25)' }} placeholder="Họ và tên (không dấu)" value={form.name1} onChange={e => setForm({ ...form, name1: e.target.value })} />
+                  </div>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <input className="modern-input" style={{ background: 'rgba(0,0,0,0.25)' }} placeholder="Ngày sinh  dd/mm/yyyy" value={form.dob1} onChange={e => setForm({ ...form, dob1: e.target.value })} />
+                  </div>
+                </div>
+              </div>
 
-      </div>
+              {/* Divider */}
+              <div style={{ display: 'flex', alignItems: 'center', padding: '0 1.25rem', gap: '0.75rem' }}>
+                <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, transparent, rgba(139,92,246,0.4))' }} />
+                <motion.div
+                  animate={{ scale: [0.9, 1.2, 0.9] }}
+                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                  style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.85rem', boxShadow: '0 0 12px rgba(236,72,153,0.4)', flexShrink: 0 }}
+                >❤️</motion.div>
+                <div style={{ flex: 1, height: '1px', background: 'linear-gradient(90deg, rgba(244,63,94,0.4), transparent)' }} />
+              </div>
+
+              {/* Person 2 */}
+              <div style={{ padding: '1rem 1.25rem 1.25rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.875rem' }}>
+                  <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: 'linear-gradient(135deg, #f43f5e, #fb7185)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700, color: '#fff', flexShrink: 0 }}>2</div>
+                  <span style={{ color: '#fb7185', fontWeight: 600, fontSize: '0.875rem' }}>Người thứ hai</span>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
+                  <input className="modern-input" style={{ background: 'rgba(0,0,0,0.25)' }} placeholder="Họ và tên (không dấu)" value={form.name2} onChange={e => setForm({ ...form, name2: e.target.value })} />
+                  <input className="modern-input" style={{ background: 'rgba(0,0,0,0.25)' }} placeholder="Ngày sinh  dd/mm/yyyy" value={form.dob2} onChange={e => setForm({ ...form, dob2: e.target.value })} />
+                </div>
+              </div>
+            </div>
+
+            {error && <p style={{ color: '#ef4444', fontSize: '0.825rem', marginBottom: '0.75rem', textAlign: 'center' }}>{error}</p>}
+
+            <motion.button
+              type="submit"
+              whileTap={{ scale: 0.97 }}
+              whileHover={{ scale: 1.02 }}
+              style={{
+                width: '100%', padding: '1rem',
+                background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+                border: 'none', borderRadius: '14px', color: '#fff',
+                fontSize: '1rem', fontWeight: 700, fontFamily: 'Outfit, sans-serif',
+                cursor: 'pointer', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', gap: '0.5rem',
+                boxShadow: '0 4px 20px rgba(236, 72, 153, 0.35)',
+              }}
+            >
+              <Heart size={18} fill="#fff" /> Phân tích duyên số
+            </motion.button>
+          </form>
+
+        </div>
       </div>
     </motion.section>
   );
@@ -1418,13 +1418,13 @@ const ModernButton = ({ children, onClick, type = "button", className = "", disa
 const InputField = ({ label, value, onChange, type = "text", placeholder }) => (
   <div className="input-group">
     <label className="input-label">{label}</label>
-    <input 
-      type={type} 
-      className="modern-input" 
-      value={value} 
-      onChange={(e) => onChange(e.target.value)} 
-      placeholder={placeholder} 
-      required 
+    <input
+      type={type}
+      className="modern-input"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      required
     />
   </div>
 );
@@ -1434,10 +1434,10 @@ const SelectionGroup = ({ label, options, value, onChange }) => (
     <label className="input-label">{label}</label>
     <div className="selection-buttons">
       {options.map(o => (
-        <button 
-          key={o} 
-          type="button" 
-          onClick={() => onChange(o)} 
+        <button
+          key={o}
+          type="button"
+          onClick={() => onChange(o)}
           className={`select-btn ${value === o ? 'active' : ''}`}
         >
           {o}
@@ -1470,16 +1470,16 @@ const CustomSelect = ({ label, options, value, onChange }) => {
       </div>
       <AnimatePresence>
         {isOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: -10 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            exit={{ opacity: 0, y: -10 }} 
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
             className="custom-select-options"
           >
             {options.map((option) => (
-              <div 
-                key={option} 
+              <div
+                key={option}
                 className={`custom-select-option ${value === option ? 'selected' : ''}`}
                 onClick={() => { onChange(option); setIsOpen(false); }}
               >
@@ -1530,13 +1530,13 @@ const gridMeanings = {
 
 const BirthChart = ({ dob }) => {
   const [hoveredNode, setHoveredNode] = useState(null);
-  const digits = dob.replace(/[^1-9]/g, '').split(''); 
+  const digits = dob.replace(/[^1-9]/g, '').split('');
   const gridMap = {
     3: { x: 2, y: 0 }, 6: { x: 2, y: 1 }, 9: { x: 2, y: 2 },
     2: { x: 1, y: 0 }, 5: { x: 1, y: 1 }, 8: { x: 1, y: 2 },
     1: { x: 0, y: 0 }, 4: { x: 0, y: 1 }, 7: { x: 0, y: 2 }
   };
-  
+
   const digitCounts = {};
   digits.forEach(d => {
     digitCounts[d] = (digitCounts[d] || 0) + 1;
@@ -1549,9 +1549,9 @@ const BirthChart = ({ dob }) => {
   }));
 
   const activeNumbers = Object.keys(digitCounts).map(Number);
-  
+
   const lines = [];
-  
+
   activeNumbers.forEach(n1 => {
     activeNumbers.forEach(n2 => {
       if (n1 >= n2) return;
@@ -1563,7 +1563,7 @@ const BirthChart = ({ dob }) => {
     });
   });
 
-  const getPos = (x, y) => ({ cx: 40 + y * 85, cy: 210 - x * 85 }); 
+  const getPos = (x, y) => ({ cx: 40 + y * 85, cy: 210 - x * 85 });
 
   return (
     <div style={{ width: '250px', height: '250px', position: 'relative', overflow: 'visible' }}>
@@ -1619,14 +1619,14 @@ const BirthChart = ({ dob }) => {
             <feComposite in="SourceGraphic" in2="blur" operator="over" />
           </filter>
         </defs>
-        
+
         {/* Lines */}
         {lines.map((line, i) => {
           const p1 = getPos(gridMap[line.n1].x, gridMap[line.n1].y);
           const p2 = getPos(gridMap[line.n2].x, gridMap[line.n2].y);
           return (
             <g key={i}>
-              <motion.line 
+              <motion.line
                 x1={p1.cx} y1={p1.cy} x2={p2.cx} y2={p2.cy}
                 stroke="rgba(139, 92, 246, 0.3)"
                 strokeWidth="2"
@@ -1634,7 +1634,7 @@ const BirthChart = ({ dob }) => {
                 animate={{ pathLength: 1 }}
                 transition={{ duration: 1.5, delay: i * 0.15 }}
               />
-              <motion.line 
+              <motion.line
                 x1={p1.cx} y1={p1.cy} x2={p2.cx} y2={p2.cy}
                 stroke="var(--primary-light)"
                 strokeWidth="2"
@@ -1656,27 +1656,27 @@ const BirthChart = ({ dob }) => {
           const meaning = gridMeanings[nodeStr] || 'Năng lượng đặc biệt';
 
           return (
-            <g key={node.num} 
-               onMouseEnter={() => isActive && setHoveredNode({ x: cx, y: cy, val: nodeStr, meaning })}
-               onMouseLeave={() => setHoveredNode(null)}
-               style={{ cursor: isActive ? 'pointer' : 'default' }}
+            <g key={node.num}
+              onMouseEnter={() => isActive && setHoveredNode({ x: cx, y: cy, val: nodeStr, meaning })}
+              onMouseLeave={() => setHoveredNode(null)}
+              style={{ cursor: isActive ? 'pointer' : 'default' }}
             >
               <circle cx={cx} cy={cy} r="6" fill={isActive ? "transparent" : "rgba(255,255,255,0.05)"} />
-              
+
               {isActive && (
-                <motion.g 
+                <motion.g
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', delay: 0.5 + i * 0.05 }}
                 >
                   {/* Breathing Glow */}
-                  <motion.circle 
-                    cx={cx} cy={cy} r="22" 
-                    fill="url(#starGlow)" 
+                  <motion.circle
+                    cx={cx} cy={cy} r="22"
+                    fill="url(#starGlow)"
                     animate={{ scale: [1, 1.2, 1], opacity: [0.6, 1, 0.6] }}
                     transition={{ duration: 2.5 + Math.random(), repeat: Infinity, ease: "easeInOut" }}
                   />
-                  
+
                   {/* Core */}
                   <circle cx={cx} cy={cy} r="4" fill="#fff" filter="url(#lineGlow)" />
                   <text x={cx} y={cy - 14} fill="#fff" fontSize="11" fontWeight="700" textAnchor="middle" style={{ textShadow: '0 0 5px rgba(139, 92, 246, 0.8)' }}>
@@ -1688,12 +1688,12 @@ const BirthChart = ({ dob }) => {
                     <motion.circle
                       key={pIdx}
                       cx={cx} cy={cy - 12} r="1.5" fill="#fff"
-                      animate={{ 
+                      animate={{
                         rotate: [0, 360],
                         scale: [0.5, 1, 0.5]
                       }}
                       style={{ originX: '50%', originY: '12px' }}
-                      transition={{ 
+                      transition={{
                         rotate: { duration: 3 + pIdx * 2, repeat: Infinity, ease: "linear", delay: pIdx },
                         scale: { duration: 1.5, repeat: Infinity, ease: "easeInOut" }
                       }}
