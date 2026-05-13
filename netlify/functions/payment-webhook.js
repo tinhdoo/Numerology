@@ -14,6 +14,15 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
+  // Verify Authorization header
+  const authHeader = event.headers['authorization'] || event.headers['Authorization'];
+  const expectedKey = process.env.VITE_SEPAY_API_KEY;
+  
+  if (!authHeader || authHeader !== `Apikey ${expectedKey}`) {
+    console.warn('[SePay Webhook] Unauthorized access attempt');
+    return { statusCode: 401, body: 'Unauthorized' };
+  }
+
   try {
     const body = JSON.parse(event.body || '{}');
 
@@ -58,12 +67,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        success: true,
-        message: 'Webhook received',
-        code: txCode,
-        amount,
-      }),
+      body: JSON.stringify({ success: true }),
     };
   } catch (err) {
     console.error('[SePay Webhook Error]', err.message);

@@ -231,6 +231,23 @@ const App = () => {
     if (isAIPaid) { action(); return; }
     openPaywall(action);
   };
+  useEffect(() => {
+    if (payStatus === 'qr' && txCode) {
+      const stop = pollPaymentConfirmation(txCode,
+        () => {
+          setIsAIPaid(true); setShowPaywall(false); setPayStatus('idle');
+          const pending = pendingActionRef.current;
+          pendingActionRef.current = null;
+          pending?.();
+        },
+        () => {
+          console.log('Auto polling timed out or failed');
+        }
+      );
+      stopPollRef.current = stop;
+      return () => stop();
+    }
+  }, [payStatus, txCode]);
 
   const handlePaymentPolling = () => {
     setPayStatus('polling');
@@ -920,7 +937,7 @@ const App = () => {
                   <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.68rem', marginBottom: '0.2rem' }}>Nội dung chuyển khoản</div>
                   <div style={{ color: '#c4b5fd', fontWeight: 700, fontSize: '1rem', letterSpacing: '0.05em' }}>{txCode}</div>
                 </div>
-                <div style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', borderRadius: '10px', padding: '0.45rem 1.25rem', fontWeight: 800, fontSize: '1.3rem', color: '#fff' }}>1.000 ₫</div>
+                <div style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', borderRadius: '10px', padding: '0.45rem 1.25rem', fontWeight: 800, fontSize: '1.3rem', color: '#fff' }}>2.000 ₫</div>
                 <div style={{ display: 'flex', gap: '0.6rem', width: '100%' }}>
                   <button onClick={handleClosePaywall} style={{ flex: 1, padding: '0.65rem', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}>Huỷ</button>
                   <button onClick={handlePaymentPolling} style={{ flex: 2, padding: '0.65rem', borderRadius: '10px', background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', border: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}>Đã chuyển khoản ✓</button>
