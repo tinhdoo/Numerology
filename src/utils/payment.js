@@ -35,15 +35,18 @@ export const getVietQRUrl = ({ bankId, accountNo, amount, description }) => {
  * Fetch your SePay bank account info to get accountNo and bankId
  */
 export const fetchSePayAccount = async () => {
-  if (!SEPAY_API_KEY) throw new Error('SePay API key missing');
-  const res = await fetch(`${SEPAY_BASE}/bankaccounts/list`, {
-    headers: {
-      'Authorization': `Bearer ${SEPAY_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-  });
-  if (!res.ok) throw new Error(`SePay account fetch failed: ${res.status}`);
+  const res = await fetch('/.netlify/functions/get-bank-account');
+  if (!res.ok) {
+    // Attempt to parse JSON error if available
+    let errMsg = `Netlify proxy fetch failed: ${res.status}`;
+    try {
+      const errData = await res.json();
+      if (errData.error) errMsg = errData.error;
+    } catch (e) {}
+    throw new Error(errMsg);
+  }
   const data = await res.json();
+  if (data.error) throw new Error(data.error);
   // Returns first active bank account
   const accounts = data?.bankaccounts || data?.data || [];
   return accounts.find(a => a.status === 1 || a.status === 'active') || accounts[0];
