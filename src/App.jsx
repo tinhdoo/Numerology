@@ -213,9 +213,17 @@ const App = () => {
         amount: PRICE, description: code,
       }));
       setPayStatus('qr');
-    } catch {
+    } catch (err) {
+      console.warn('Failed to fetch SePay account, using fallback:', err.message);
       const code = generateTransactionCode();
-      setTxCode(code); setQrUrl(''); setPayStatus('qr');
+      setTxCode(code);
+      setQrUrl(getVietQRUrl({
+        bankId: 'TPBANK', 
+        accountNo: '04179680001', 
+        amount: PRICE, 
+        description: code,
+      }));
+      setPayStatus('qr');
     }
   };
 
