@@ -50,51 +50,36 @@ export const fetchSePayAccount = async () => {
 };
 
 /**
- * Poll SePay transactions to verify a payment by matching description code
- * @param {string} code - Unique transaction code to match
- * @param {Function} onSuccess - Called when payment confirmed
- * @param {Function} onFail - Called when timeout or error
- * @returns {Function} stop - Call to cancel polling
+ * Poll via Netlify proxy function to check payment confirmation.
+ * Avoids CORS issues — the function runs server-side and calls SePay.
  */
 export const pollPaymentConfirmation = (code, onSuccess, onFail) => {
-  if (!SEPAY_API_KEY) { onFail('No API key'); return () => {}; }
-
   let stopped = false;
   let attempts = 0;
   const MAX_ATTEMPTS = 24; // 2 minutes (5s interval)
 
+  // Detect if running on Netlify or localhost
+  const base = window.location.hostname === 'localhost'
+    ? '' // will fail gracefully on localhost — use manual confirm
+    : '';
+
   const check = async () => {
     if (stopped) return;
     try {
-      const res = await fetch(
-        `${SEPAY_BASE}/transactions/list?account_number=all&limit=20`,
-        {
-          headers: {
-            'Authorization': `Bearer ${SEPAY_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
+      const res = await fetch(`/.netlify/functions/check-payment?code=${encodeURIComponent(code)}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.found) {
+          stopped = true;
+          onSuccess(data.transaction);
+          return;
         }
-      );
-      if (!res.ok) throw new Error(`Poll failed: ${res.status}`);
-      const data = await res.json();
-      const txns = data?.transactions || data?.data || [];
-      const found = txns.find(t =>
-        String(t.transaction_content || t.description || '').includes(code) &&
-        Number(t.amount_in || t.amount || 0) >= PRICE
-      );
-      if (found) {
-        stopped = true;
-        onSuccess(found);
-        return;
       }
     } catch (e) {
       console.warn('Poll error:', e.message);
     }
     attempts++;
-    if (attempts >= MAX_ATTEMPTS) {
-      onFail('Timeout');
-      return;
-    }
+    if (attempts >= MAX_ATTEMPTS) { onFail('Timeout'); return; }
     setTimeout(check, 5000);
   };
 
