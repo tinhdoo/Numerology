@@ -28,7 +28,7 @@ export const generateTransactionCode = () => {
  */
 export const getVietQRUrl = ({ bankId, accountNo, amount, description }) => {
   const encoded = encodeURIComponent(description);
-  return `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png?amount=${amount}&addInfo=${encoded}&accountName=TOMATO`;
+  return `https://qr.sepay.vn/img?acc=${accountNo}&bank=${bankId}&amount=${amount}&des=${encoded}`;
 };
 
 /**
