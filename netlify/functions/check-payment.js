@@ -25,7 +25,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const res = await fetch('https://my.sepay.vn/userapi/transactions/list?account_number=all&limit=20', {
+    const res = await fetch('https://userapi.sepay.vn/v2/transactions?per_page=20', {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',

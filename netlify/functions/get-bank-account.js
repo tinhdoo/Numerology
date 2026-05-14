@@ -20,7 +20,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const res = await fetch('https://my.sepay.vn/userapi/bankaccounts/list', {
+    const res = await fetch('https://userapi.sepay.vn/v2/bank-accounts', {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',

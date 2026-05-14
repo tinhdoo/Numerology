@@ -16,23 +16,20 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  // Verify HMAC Signature
-  const signature = event.headers['x-sepay-signature'] || event.headers['X-SePay-Signature'] || '';
-  const timestamp = event.headers['x-sepay-timestamp'] || event.headers['X-SePay-Timestamp'] || '';
-  const secret = process.env.VITE_SEPAY_WEBHOOK_SECRET;
-  
-  if (!secret) {
-    console.error('[SePay Webhook] VITE_SEPAY_WEBHOOK_SECRET is not set');
+  // Verify API Key from Authorization header (as configured in SePay dashboard)
+  const authHeader = event.headers['authorization'] || event.headers['Authorization'] || '';
+  const apiKey = process.env.VITE_SEPAY_API_KEY;
+
+  if (!apiKey) {
+    console.error('[SePay Webhook] VITE_SEPAY_API_KEY is not set');
     return { statusCode: 500, body: 'Server Configuration Error' };
   }
 
-  const payload = event.body || '';
-  const expected = 'sha256=' + crypto.createHmac('sha256', secret)
-      .update(timestamp + '.' + payload).digest('hex');
-
-  if (signature !== expected) {
-    console.warn('[SePay Webhook] Invalid signature');
-    return { statusCode: 401, body: 'Invalid signature' };
+  const expectedAuth = `Apikey ${apiKey}`;
+  
+  if (authHeader !== expectedAuth) {
+    console.warn('[SePay Webhook] Invalid Authorization header');
+    return { statusCode: 401, body: 'Unauthorized' };
   }
 
   try {
