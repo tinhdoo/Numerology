@@ -171,14 +171,18 @@ Hãy đưa ra câu trả lời ngắn gọn, đúng trọng tâm câu hỏi củ
   }
 };
 
-export const generateIndividualCardMeanings = async (cards, category) => {
+export const generateIndividualCardMeanings = async (cards, category, person = {}) => {
   try {
+    const personContext = person.name || person.dob
+      ? `Thông tin người xem: ${person.name || 'Không rõ tên'}, sinh ngày ${person.dob || 'không rõ'}, giới tính ${person.gender || 'không rõ'}.`
+      : '';
     const cardDetails = cards.map((card, i) => 
       `Lá bài ${i+1}: ${card.rank} ${card.suit} ${card.isReversed ? '(Ngược)' : '(Xuôi)'}. Ý nghĩa gốc: ${card.isReversed ? card.meaningReversed || card.meaning : card.meaningUpright || card.meaning}`
     ).join('\n');
 
     const prompt = `
 Bạn là một chuyên gia bói bài Tây. Người dùng đang hỏi về chủ đề: "${category}".
+${personContext}
 Họ rút được 3 lá bài sau:
 ${cardDetails}
 

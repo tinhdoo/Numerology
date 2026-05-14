@@ -64,6 +64,55 @@ const ShootingStars = () => {
   );
 };
 
+const getContextualCardMeaning = (card, category) => {
+  const rank = card.rank;
+  const symbol = card.symbol;
+  const isReversed = card.isReversed;
+  const baseTone = isReversed ? 'năng lượng đang bị chặn hoặc đi chậm hơn dự tính' : 'năng lượng đang mở ra khá rõ';
+
+  const suitTone = {
+    '♥': {
+      love: 'cảm xúc thật, sự quan tâm và khả năng tiến gần nhau hơn',
+      career: 'mối quan hệ nơi làm việc, sự hỗ trợ và thiện cảm từ người khác',
+      money: 'tiền bạc chịu ảnh hưởng bởi gia đình, cảm xúc hoặc người thân',
+      future: 'một giai đoạn mềm lại, dễ có tin vui hoặc sự hàn gắn',
+    },
+    '♦': {
+      love: 'tin nhắn, khoảng cách, sự dịch chuyển hoặc một thay đổi trong cách hai người tương tác',
+      career: 'cơ hội mới, thay đổi nhịp làm việc hoặc việc cần quyết nhanh',
+      money: 'dòng tiền biến động, khoản chi/thu đến nhanh và cần tính toán kỹ',
+      future: 'một chuyển động mới sắp xuất hiện, nhưng cần tỉnh táo khi ra quyết định',
+    },
+    '♣': {
+      love: 'sự ổn định, thực tế và cách hai người xây dựng niềm tin qua hành động',
+      career: 'nền tảng công việc, kỹ năng, đồng nghiệp và những kết quả đến từ sự bền bỉ',
+      money: 'nguồn lợi nhỏ, khả năng xoay xở và bài học về quản lý tài chính',
+      future: 'kết quả đến chậm nhưng chắc, miễn là bạn đi từng bước rõ ràng',
+    },
+    '♠': {
+      love: 'khúc mắc, im lặng, hiểu lầm hoặc cảm giác bất an cần được nói rõ',
+      career: 'áp lực, cạnh tranh hoặc một trở ngại cần xử lý bằng kỷ luật',
+      money: 'rủi ro hao hụt, khoản chi bất ngờ hoặc quyết định tài chính cần tránh nóng vội',
+      future: 'một thử thách đang nhắc bạn thận trọng trước khi bước tiếp',
+    },
+  };
+
+  const byCategory = {
+    'Tình cảm': 'love',
+    'Sự nghiệp': 'career',
+    'Tiền bạc': 'money',
+    'Tương lai': 'future',
+  };
+
+  const key = byCategory[category] || 'future';
+  const theme = suitTone[symbol]?.[key] || (card.isReversed && card.meaningReversed ? card.meaningReversed : (card.meaningUpright || card.meaning));
+  const direction = isReversed
+    ? 'Bạn nên chậm lại, kiểm tra kỳ vọng và đừng vội kết luận.'
+    : 'Bạn có thể chủ động hơn, nhưng vẫn nên quan sát tín hiệu thực tế.';
+
+  return `Với chủ đề ${category}, lá ${rank} ${card.suit} cho thấy ${theme}; ${baseTone}. ${direction}`;
+};
+
 const FormattedText = ({ text }) => {
   if (!text) return null;
   let htmlText = text
@@ -88,7 +137,8 @@ const App = () => {
   const [monthlyPredictions, setMonthlyPredictions] = useState(null);
 
   const [westernStep, setWesternStep] = useState(1);
-  const [westernConfig, setWesternConfig] = useState({ gender: 'Nam', category: 'Tương lai', shuffleGoal: 7 });
+  const [westernConfig, setWesternConfig] = useState({ name: '', dob: '', gender: 'Nam', category: 'Tương lai', shuffleGoal: 7 });
+  const [westernFormError, setWesternFormError] = useState('');
   const [shuffleCount, setShuffleCount] = useState(0);
   const [isShuffling, setIsShuffling] = useState(false);
   const [finalCards, setFinalCards] = useState([]);
@@ -99,17 +149,18 @@ const App = () => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   // AI State
-  const [aiLoading, setAiLoading] = useState(false);
-  const [chatHistory, setChatHistory] = useState([]);
+  const [aiLoading, setAiLoading] = useState({ numerology: false, western: false });
+  const [chatHistory, setChatHistory] = useState({ numerology: [], western: [] });
 
   // Global Payment State
-  const [isAIPaid, setIsAIPaid] = useState(false);
+  const [paidFeatures, setPaidFeatures] = useState({ numerology: false, western: false, soulmate: false });
   const [showPaywall, setShowPaywall] = useState(false);
   const [payStatus, setPayStatus] = useState('idle');
   const [qrUrl, setQrUrl] = useState('');
   const [txCode, setTxCode] = useState('');
   const stopPollRef = useRef(null);
   const pendingActionRef = useRef(null);
+  const pendingFeatureRef = useRef(null);
 
   // Soulmate State
   const [soulmateForm, setSoulmateForm] = useState({ name1: '', dob1: '', name2: '', dob2: '' });
@@ -190,31 +241,15 @@ const App = () => {
     const py = calculatePersonalYear(dob);
     const detailed = getDetailedAnalysis(lp, destiny, soul);
     setNumResults({ dob, lp, destiny, soul, personality, py, detailed });
-    setChatHistory([]);
+    setMonthlyPredictions(null);
+    setNumLoading(false);
+    setChatHistory(prev => ({ ...prev, numerology: [] }));
     setCurrentView('numerology');
-
-    const fetchAiReport = async () => {
-      setNumLoading(true);
-      setMonthlyPredictions(null);
-      // Sequential calls to avoid exhausting rate limits simultaneously
-      const aiDetailed = await generateNumerologyReport({ lp, destiny, soul, personality, py });
-      if (aiDetailed) {
-        setNumResults(prev => ({
-          ...prev,
-          detailed: { ...prev.detailed, lpText: aiDetailed.lpText, destinyText: aiDetailed.destinyText }
-        }));
-      }
-      // Small gap between calls
-      await new Promise(r => setTimeout(r, 1500));
-      const aiMonths = await generateMonthlyPredictions({ lp, destiny, py });
-      if (aiMonths) setMonthlyPredictions(aiMonths);
-      setNumLoading(false);
-    };
-    requirePayment(fetchAiReport);
   };
 
   // ── Payment handlers (App-level) ──────────────────────────────────────────
-  const openPaywall = async (action) => {
+  const openPaywall = async (feature, action) => {
+    pendingFeatureRef.current = feature;
     pendingActionRef.current = action || null;
     setShowPaywall(true);
     setPayStatus('loading');
@@ -242,17 +277,20 @@ const App = () => {
     }
   };
 
-  const requirePayment = (action) => {
-    if (isAIPaid) { action(); return; }
-    openPaywall(action);
+  const requirePayment = (feature, action) => {
+    if (paidFeatures[feature]) { action(); return; }
+    openPaywall(feature, action);
   };
   useEffect(() => {
     if (payStatus === 'qr' && txCode) {
       const stop = pollPaymentConfirmation(txCode,
         () => {
-          setIsAIPaid(true); setShowPaywall(false); setPayStatus('idle');
+          const feature = pendingFeatureRef.current;
+          if (feature) setPaidFeatures(prev => ({ ...prev, [feature]: true }));
+          setShowPaywall(false); setPayStatus('idle');
           const pending = pendingActionRef.current;
           pendingActionRef.current = null;
+          pendingFeatureRef.current = null;
           pending?.();
         },
         () => {
@@ -269,9 +307,12 @@ const App = () => {
     setPayStatus('polling');
     const stop = pollPaymentConfirmation(txCode,
       () => {
-        setIsAIPaid(true); setShowPaywall(false); setPayStatus('idle');
+        const feature = pendingFeatureRef.current;
+        if (feature) setPaidFeatures(prev => ({ ...prev, [feature]: true }));
+        setShowPaywall(false); setPayStatus('idle');
         const pending = pendingActionRef.current;
         pendingActionRef.current = null;
+        pendingFeatureRef.current = null;
         pending?.();
       },
       () => setPayStatus('error')
@@ -284,19 +325,86 @@ const App = () => {
     setShowPaywall(false); setPayStatus('idle');
     setQrUrl(''); setTxCode('');
     pendingActionRef.current = null;
+    pendingFeatureRef.current = null;
+  };
+
+  const unlockNumerologyAi = () => {
+    if (!numResults) return;
+    requirePayment('numerology', async () => {
+      setNumLoading(true);
+      setMonthlyPredictions(null);
+      const { lp, destiny, soul, personality, py } = numResults;
+      const aiDetailed = await generateNumerologyReport({ lp, destiny, soul, personality, py });
+      if (aiDetailed) {
+        setNumResults(prev => ({
+          ...prev,
+          detailed: { ...prev.detailed, lpText: aiDetailed.lpText, destinyText: aiDetailed.destinyText }
+        }));
+      }
+      await new Promise(r => setTimeout(r, 1500));
+      const aiMonths = await generateMonthlyPredictions({ lp, destiny, py });
+      if (aiMonths) setMonthlyPredictions(aiMonths);
+      setNumLoading(false);
+    });
+  };
+
+  const unlockWesternCardAi = () => {
+    if (!finalCards.length) return;
+    requirePayment('western', async () => {
+      setLoadingCards(true);
+      const meanings = await generateIndividualCardMeanings(finalCards, westernConfig.category, westernConfig);
+      setAiCardMeanings(meanings);
+      setLoadingCards(false);
+    });
+  };
+
+  const startWesternReading = () => {
+    const name = westernConfig.name.trim();
+    const dob = westernConfig.dob.trim();
+    const match = dob.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+
+    if (!name) {
+      setWesternFormError('Vui lòng nhập họ tên.');
+      return;
+    }
+
+    if (!match) {
+      setWesternFormError('Nhập ngày sinh theo định dạng dd/mm/yyyy.');
+      return;
+    }
+
+    const day = Number(match[1]);
+    const month = Number(match[2]);
+    const year = Number(match[3]);
+    const date = new Date(year, month - 1, day);
+    if (
+      day < 1 || day > 31 ||
+      month < 1 || month > 12 ||
+      year < 1900 || year > new Date().getFullYear() ||
+      date.getFullYear() !== year ||
+      date.getMonth() !== month - 1 ||
+      date.getDate() !== day
+    ) {
+      setWesternFormError('Ngày sinh không hợp lệ.');
+      return;
+    }
+
+    setWesternFormError('');
+    setWesternStep(2);
   };
 
   const handleShuffle = () => {
     if (isShuffling) return;
+    const nextShuffleCount = shuffleCount + 1;
     setIsShuffling(true);
     if (shuffleSound.current) {
       shuffleSound.current.currentTime = 0;
       shuffleSound.current.play().catch(() => { });
     }
     setTimeout(() => {
-      setShuffleCount(prev => prev + 1);
+      setShuffleCount(nextShuffleCount);
       setIsShuffling(false);
-      if (shuffleCount + 1 >= westernConfig.shuffleGoal) {
+      if (nextShuffleCount >= westernConfig.shuffleGoal) {
         const shuffled = [...westernDeck].sort(() => 0.5 - Math.random());
         setShuffledDeck(shuffled);
         setSelectedCardIndices([]);
@@ -317,14 +425,11 @@ const App = () => {
         return { ...card, isReversed: shouldReverse };
       });
       setFinalCards(results);
-      setChatHistory([]);
+      setChatHistory(prev => ({ ...prev, western: [] }));
       setAiCardMeanings([]);
-      setTimeout(async () => {
+      setLoadingCards(false);
+      setTimeout(() => {
         setWesternStep(4);
-        setLoadingCards(true);
-        const meanings = await generateIndividualCardMeanings(results, westernConfig.category);
-        setAiCardMeanings(meanings);
-        setLoadingCards(false);
       }, 1000);
     }
   };
@@ -338,30 +443,31 @@ const App = () => {
     setSelectedCardIndices([]);
     setAiCardMeanings([]);
     setLoadingCards(false);
-    setChatHistory([]);
+    setChatHistory(prev => ({ ...prev, western: [] }));
   };
 
   const askAI = (type) => {
-    requirePayment(async () => {
-      setAiLoading(true);
-      setChatHistory([]);
-      const data = type === 'numerology' ? { ...numResults, ...numResults.detailed } : { cards: finalCards, category: westernConfig.category };
+    requirePayment(type, async () => {
+      setAiLoading(prev => ({ ...prev, [type]: true }));
+      setChatHistory(prev => ({ ...prev, [type]: [] }));
+      const data = type === 'numerology' ? { ...numResults, ...numResults.detailed } : { cards: finalCards, category: westernConfig.category, person: westernConfig };
       const advice = await generateAIAdvice(type, data);
-      setChatHistory([{ role: 'ai', text: advice }]);
-      setAiLoading(false);
+      setChatHistory(prev => ({ ...prev, [type]: [{ role: 'ai', text: advice }] }));
+      setAiLoading(prev => ({ ...prev, [type]: false }));
     });
   };
 
   const handleSendQuestion = (type, question) => {
     if (!question.trim()) return;
-    requirePayment(async () => {
-      const newHistory = [...chatHistory, { role: 'user', text: question }];
-      setChatHistory(newHistory);
-      setAiLoading(true);
-      const data = type === 'numerology' ? { ...numResults, ...numResults.detailed } : { cards: finalCards, category: westernConfig.category };
+    requirePayment(type, async () => {
+      const currentHistory = chatHistory[type] || [];
+      const newHistory = [...currentHistory, { role: 'user', text: question }];
+      setChatHistory(prev => ({ ...prev, [type]: newHistory }));
+      setAiLoading(prev => ({ ...prev, [type]: true }));
+      const data = type === 'numerology' ? { ...numResults, ...numResults.detailed } : { cards: finalCards, category: westernConfig.category, person: westernConfig };
       const answer = await askFollowUpQuestion(type, data, newHistory, question);
-      setChatHistory([...newHistory, { role: 'ai', text: answer }]);
-      setAiLoading(false);
+      setChatHistory(prev => ({ ...prev, [type]: [...newHistory, { role: 'ai', text: answer }] }));
+      setAiLoading(prev => ({ ...prev, [type]: false }));
     });
   };
 
@@ -603,24 +709,7 @@ const App = () => {
                           type="submit"
                           whileTap={{ scale: 0.97 }}
                           whileHover={{ scale: 1.02 }}
-                          style={{
-                            width: '100%',
-                            padding: '1rem',
-                            background: 'linear-gradient(135deg, #8b5cf6, #6366f1)',
-                            border: 'none',
-                            borderRadius: '14px',
-                            color: '#fff',
-                            fontSize: '1rem',
-                            fontWeight: 700,
-                            fontFamily: 'Outfit, sans-serif',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '0.5rem',
-                            boxShadow: '0 4px 20px rgba(139, 92, 246, 0.4)',
-                            letterSpacing: '0.02em',
-                          }}
+                          className="app-button app-button--secondary app-button--full app-button--lg"
                         >
                           <Sparkles size={18} /> Phân Tích Ngay
                         </motion.button>
@@ -684,6 +773,12 @@ const App = () => {
                             <Loader2 className="loader-spin" size={24} />
                             <span className="ai-loading-text">AI đang tính toán các đỉnh năng lượng...</span>
                           </div>
+                        ) : !paidFeatures.numerology ? (
+                          <LockedAiPanel
+                            title="Mở khóa dự đoán AI"
+                            description="Phần đỉnh cao năng lượng theo tháng dùng AI cá nhân hóa từ các chỉ số của bạn."
+                            onUnlock={unlockNumerologyAi}
+                          />
                         ) : monthlyPredictions ? (
                           <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             {/* 12-Month Timeline */}
@@ -748,7 +843,7 @@ const App = () => {
                             })}
                           </div>
                         ) : (
-                          <p style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>Không thể dự đoán vào lúc này.</p>
+                          <LockedAiPanel title="Tạo dự đoán AI" description="Tạo lại phân tích tháng và diễn giải chuyên sâu cho hồ sơ hiện tại." actionLabel="Tạo bằng AI" onUnlock={unlockNumerologyAi} unlocked />
                         )}
                       </div>
                     </div>
@@ -758,7 +853,7 @@ const App = () => {
                       <ReportCard title="Chỉ số Sứ Mệnh" text={numResults.detailed.destinyText} loading={numLoading} />
                     </div>
 
-                    <AIWisdomSection loading={aiLoading} chatHistory={chatHistory} onAsk={() => askAI('numerology')} onSendQuestion={(q) => handleSendQuestion('numerology', q)} isAIPaid={isAIPaid} onRequestPayment={openPaywall} />
+                    <AIWisdomSection loading={aiLoading.numerology} chatHistory={chatHistory.numerology} onAsk={() => askAI('numerology')} onSendQuestion={(q) => handleSendQuestion('numerology', q)} isAIPaid={paidFeatures.numerology} />
                   </div>
                 )}
               </motion.section>
@@ -774,20 +869,40 @@ const App = () => {
                 setLoading={setSoulmateLoading}
                 error={soulmateError}
                 setError={setSoulmateError}
+                isPaid={paidFeatures.soulmate}
+                requirePayment={requirePayment}
               />
             )}
 
             {currentView === 'western' && (
               <motion.section key="western" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 {westernStep === 1 && (
-                  <div style={{ minHeight: 'calc(100dvh - 140px)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <div style={{ maxWidth: '520px', margin: '0 auto', padding: '0 0.5rem', width: '100%' }}>
-                      <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-                        <h2 className="primary-gradient-text" style={{ fontSize: '1.5rem', marginBottom: '0.35rem', lineHeight: 1.2, fontWeight: 700, whiteSpace: 'nowrap' }}>Bói Bài Tây</h2>
-                        <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.4 }}>Trải 3 lá bài, nhận thông điệp từ vũ trụ.</p>
+                  <div className="western-setup-screen" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 'calc(100dvh - 120px)', padding: '1rem 0' }}>
+                    <div className="western-setup-shell">
+                      <div className="western-setup-header">
+                        <h2 className="primary-gradient-text">Bói Bài Tây</h2>
+                        <p>Trải 3 lá bài, nhận thông điệp từ vũ trụ.</p>
                       </div>
                       <div className="western-setup-grid">
                         <div className="setup-panel">
+                          <div className="input-group">
+                            <label className="input-label">Họ và tên</label>
+                            <input
+                              className="modern-input"
+                              placeholder="VD: Nguyễn Văn A"
+                              value={westernConfig.name}
+                              onChange={(e) => setWesternConfig({ ...westernConfig, name: e.target.value })}
+                            />
+                          </div>
+                          <div className="input-group">
+                            <label className="input-label">Ngày sinh</label>
+                            <input
+                              className="modern-input"
+                              placeholder="dd/mm/yyyy"
+                              value={westernConfig.dob}
+                              onChange={(e) => setWesternConfig({ ...westernConfig, dob: e.target.value })}
+                            />
+                          </div>
                           <SelectionGroup label="Giới tính" options={['Nam', 'Nữ']} value={westernConfig.gender} onChange={(v) => setWesternConfig({ ...westernConfig, gender: v, shuffleGoal: v === 'Nam' ? 7 : 9 })} />
                           <CustomSelect
                             label="Chủ đề muốn hỏi"
@@ -797,33 +912,18 @@ const App = () => {
                           />
                         </div>
                         <div className="setup-instructions">
-                          <p style={{ color: 'var(--text-dim)', lineHeight: 1.6, fontSize: '0.9rem', textAlign: 'center' }}>
-                            Giữ tâm trí tĩnh lặng, tập trung vào câu hỏi về chủ đề <strong style={{ color: '#fff' }}>{westernConfig.category}</strong>.
+                          <p style={{ fontSize: '0.75rem', opacity: 0.85 }}>
+                            Giữ tâm trí tĩnh lặng, tập trung vào câu hỏi về chủ đề <strong>{westernConfig.category}</strong>.
                           </p>
                           <motion.button
-                            onClick={() => setWesternStep(2)}
+                            onClick={startWesternReading}
                             whileTap={{ scale: 0.97 }}
                             whileHover={{ scale: 1.02 }}
-                            style={{
-                              width: '100%',
-                              padding: '1rem',
-                              background: 'linear-gradient(135deg, #3b82f6, #6366f1)',
-                              border: 'none',
-                              borderRadius: '14px',
-                              color: '#fff',
-                              fontSize: '1rem',
-                              fontWeight: 700,
-                              fontFamily: 'Outfit, sans-serif',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '0.5rem',
-                              boxShadow: '0 4px 20px rgba(59, 130, 246, 0.35)',
-                            }}
+                            className="app-button app-button--secondary app-button--full app-button--lg"
                           >
                             <Layers size={18} /> Bắt đầu trải bài
                           </motion.button>
+                          {westernFormError && <p style={{ color: '#ef4444', fontSize: '0.82rem', margin: '0.25rem 0 0', textAlign: 'center' }}>{westernFormError}</p>}
                         </div>
                       </div>
                     </div>
@@ -831,20 +931,33 @@ const App = () => {
                 )}
 
                 {westernStep === 2 && (
-                  <div className="glass-container centered">
-                    <h2 className="primary-gradient-text" style={{ fontSize: '1.75rem', marginBottom: '3rem' }}>Đang xào bài ({shuffleCount}/{westernConfig.shuffleGoal})</h2>
+                  <div className="western-shuffle-screen">
+                  <div className="glass-container centered shuffle-panel">
+                    <div className="shuffle-header">
+                      <div className="shuffle-eyebrow">Nghi thức trải bài</div>
+                      <h2 className="primary-gradient-text">Đang xào bài</h2>
+                      <div className="shuffle-progress-text">{shuffleCount}/{westernConfig.shuffleGoal}</div>
+                      <div className="shuffle-progress-track">
+                        <motion.div
+                          className="shuffle-progress-fill"
+                          animate={{ width: `${Math.min(100, (shuffleCount / westernConfig.shuffleGoal) * 100)}%` }}
+                          transition={{ duration: 0.25, ease: 'easeOut' }}
+                        />
+                      </div>
+                    </div>
                     <div className="shuffling-stage">
-                      {Array.from({ length: 8 }).map((_, i) => (
+                      <div className="shuffle-orbit shuffle-orbit-one" />
+                      <div className="shuffle-orbit shuffle-orbit-two" />
+                      {Array.from({ length: 7 }).map((_, i) => (
                         <motion.div
                           key={i}
                           animate={isShuffling ? {
-                            x: i % 2 === 0 ? [0, -150, 0] : [0, 150, 0],
-                            y: [0, -30, 0],
-                            rotateZ: i % 2 === 0 ? [0, -20, 0] : [0, 20, 0],
-                            rotateY: i % 2 === 0 ? [0, 60, 0] : [0, -60, 0],
-                            scale: [1, 1.05, 1]
-                          } : { x: 0, y: -i * 2, rotateZ: 0, rotateY: 0, scale: 1 }}
-                          transition={{ duration: 0.5, ease: "circInOut" }}
+                            x: i % 2 === 0 ? [0, -72, 28, 0] : [0, 72, -28, 0],
+                            y: [0, -18, 8, -i * 2],
+                            rotate: i % 2 === 0 ? [0, -9, 6, 0] : [0, 9, -6, 0],
+                            scale: [1, 1.02, 1],
+                          } : { x: 0, y: -i * 2, rotate: 0, scale: 1 }}
+                          transition={{ duration: 0.42, ease: "easeInOut", times: [0, 0.4, 0.72, 1] }}
                           className="shuffle-card"
                           style={{ zIndex: isShuffling ? (i % 2 === 0 ? 50 + i : 50 - i) : 100 - i }}
                         >
@@ -852,9 +965,11 @@ const App = () => {
                         </motion.div>
                       ))}
                     </div>
-                    <ModernButton onClick={handleShuffle} disabled={isShuffling || shuffleCount >= westernConfig.shuffleGoal}>
+                    <button className="app-button app-button--primary app-button--pill shuffle-action" onClick={handleShuffle} disabled={isShuffling || shuffleCount >= westernConfig.shuffleGoal}>
                       {isShuffling ? 'Đang trộn...' : (shuffleCount >= westernConfig.shuffleGoal ? 'Hoàn tất' : 'Xào bài')}
-                    </ModernButton>
+                    </button>
+                    <p className="shuffle-hint">Mỗi lượt xào giúp bộ bài ổn định năng lượng trước khi chọn 3 lá.</p>
+                  </div>
                   </div>
                 )}
 
@@ -872,23 +987,9 @@ const App = () => {
                             animate={{ opacity: 1, scale: 1, y: isSelected ? -15 : 0 }}
                             whileHover={!isSelected ? { y: -10, boxShadow: '0 5px 15px rgba(139, 92, 246, 0.3)' } : {}}
                             onClick={() => handleSelectCard(index)}
-                            style={{
-                              width: '55px', height: '82px',
-                              border: isSelected ? '2px solid var(--primary-light)' : '1px solid rgba(255,255,255,0.2)',
-                              background: isSelected ? 'rgba(139, 92, 246, 0.2)' : 'linear-gradient(135deg, #1e1e38 0%, #151528 100%)',
-                              borderRadius: '6px',
-                              cursor: 'pointer',
-                              transition: 'all 0.3s',
-                              position: 'relative',
-                              overflow: 'hidden'
-                            }}
+                            className={`select-card-back ${isSelected ? 'selected' : ''}`}
                           >
-                            <div style={{
-                              position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
-                              backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'16\' height=\'16\' viewBox=\'0 0 16 16\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M8 0l2 6L16 8l-6 2L8 16l-2-6L0 8l6-2L8 0z\' fill=\'rgba(255,255,255,0.05)\' fill-rule=\'evenodd\'/%3E%3C/svg%3E")',
-                              backgroundSize: '16px 16px',
-                              opacity: isSelected ? 0 : 1
-                            }} />
+                            <div className="select-card-back-glow" />
                           </motion.div>
                         );
                       })}
@@ -904,7 +1005,7 @@ const App = () => {
                           <motion.div
                             key={i}
                             initial={{ opacity: 0, y: 50, scale: 0.9 }}
-                            animate={{ opacity: 1, y: i * 20, x: (i - 1) * spreadDistance, rotate: (i - 1) * 10, scale: 1 }}
+                            animate={{ opacity: 1, y: i * 14, x: (i - 1) * spreadDistance, rotate: (i - 1) * 8, scale: 1 }}
                             transition={{ delay: i * 0.2, type: "spring" }}
                             className="fan-card-item"
                           >
@@ -914,15 +1015,15 @@ const App = () => {
                       </div>
                     </div>
                     <div className="analysis-scroller">
-                      <div style={{ marginBottom: '2rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                      <div className="western-result-header">
                         <div>
-                          <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600, marginBottom: '0.5rem' }}>Chủ đề</p>
-                          <h2 className="primary-gradient-text" style={{ fontSize: '2rem', fontWeight: 700 }}>{westernConfig.category}</h2>
+                          <p className="western-result-kicker">Chủ đề</p>
+                          <h2 className="primary-gradient-text">{westernConfig.category}</h2>
                         </div>
                         <button onClick={resetWesternReading} className="back-btn">← Trải bài mới</button>
                       </div>
 
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem' }}>
+                      <div className="western-card-meanings">
                         {finalCards.map((card, i) => (
                           <div key={i} className="report-card" style={{ marginBottom: 0 }}>
                             <div className="title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -935,13 +1036,25 @@ const App = () => {
                                 <span className="ai-loading-text" style={{ fontSize: '0.875rem' }}>AI đang giải mã ý nghĩa lá bài theo chủ đề {westernConfig.category}...</span>
                               </div>
                             ) : (
-                              <p className="text">"{aiCardMeanings[i] || (card.isReversed && card.meaningReversed ? card.meaningReversed : (card.meaningUpright || card.meaning))}"</p>
+                              <p className="text">"{paidFeatures.western && aiCardMeanings[i] ? aiCardMeanings[i] : getContextualCardMeaning(card, westernConfig.category)}"</p>
                             )}
                           </div>
                         ))}
                       </div>
 
-                      <AIWisdomSection loading={aiLoading} chatHistory={chatHistory} onAsk={() => askAI('western')} onSendQuestion={(q) => handleSendQuestion('western', q)} isAIPaid={isAIPaid} onRequestPayment={openPaywall} />
+                      {!paidFeatures.western || !aiCardMeanings.length ? (
+                        <div style={{ marginBottom: '2rem' }}>
+                          <LockedAiPanel
+                            title={paidFeatures.western ? 'Tạo diễn giải AI' : 'Mở khóa diễn giải AI'}
+                            description="Các lá bài cơ bản đã hiển thị. AI sẽ cá nhân hóa lời giải theo chủ đề bạn chọn."
+                            actionLabel={paidFeatures.western ? 'Tạo diễn giải AI' : 'Mở khóa AI'}
+                            onUnlock={unlockWesternCardAi}
+                            unlocked={paidFeatures.western}
+                          />
+                        </div>
+                      ) : null}
+
+                      <AIWisdomSection loading={aiLoading.western} chatHistory={chatHistory.western} onAsk={() => askAI('western')} onSendQuestion={(q) => handleSendQuestion('western', q)} isAIPaid={paidFeatures.western} />
                     </div>
                   </div>
                 )}
@@ -1006,18 +1119,7 @@ const App = () => {
 
                 <button
                   onClick={() => setShowDailyMessage(false)}
-                  style={{
-                    background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '0.75rem 1.5rem',
-                    color: '#fff',
-                    fontWeight: 600,
-                    fontSize: '0.875rem',
-                    cursor: 'pointer',
-                    fontFamily: 'Outfit, sans-serif',
-                    boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)'
-                  }}
+                  className="app-button app-button--primary"
                 >
                   Đón nhận
                 </button>
@@ -1056,8 +1158,8 @@ const App = () => {
                 </div>
                 <div style={{ background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', borderRadius: '10px', padding: '0.45rem 1.25rem', fontWeight: 800, fontSize: '1.3rem', color: '#fff' }}>2.000 ₫</div>
                 <div style={{ display: 'flex', gap: '0.6rem', width: '100%' }}>
-                  <button onClick={handleClosePaywall} style={{ flex: 1, padding: '0.65rem', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}>Huỷ</button>
-                  <button onClick={handlePaymentPolling} style={{ flex: 2, padding: '0.65rem', borderRadius: '10px', background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', border: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}>Đã chuyển khoản ✓</button>
+                  <button onClick={handleClosePaywall} className="app-button app-button--ghost app-button--sm app-button--grow">Huỷ</button>
+                  <button onClick={handlePaymentPolling} className="app-button app-button--primary app-button--sm app-button--grow-2">Đã chuyển khoản ✓</button>
                 </div>
                 <div style={{ color: 'rgba(255,255,255,0.18)', fontSize: '0.65rem' }}>Thanh toán an toàn · Một lần duy nhất</div>
               </>)}
@@ -1071,7 +1173,7 @@ const App = () => {
                     stopPollRef.current?.();
                     setPayStatus('qr');
                   }} 
-                  style={{ marginTop: '1rem', padding: '0.5rem 1rem', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}
+                  className="app-button app-button--ghost app-button--sm" style={{ marginTop: '1rem' }}
                 >
                   ← Quay lại
                 </button>
@@ -1082,8 +1184,8 @@ const App = () => {
                 <div style={{ color: '#fbbf24', fontWeight: 600 }}>Không tìm thấy giao dịch</div>
                 <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem' }}>Hết thời gian. Nếu đã chuyển khoản, liên hệ hỗ trợ.</div>
                 <div style={{ display: 'flex', gap: '0.6rem', width: '100%' }}>
-                  <button onClick={handleClosePaywall} style={{ flex: 1, padding: '0.65rem', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.45)', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}>Đóng</button>
-                  <button onClick={() => setPayStatus('qr')} style={{ flex: 2, padding: '0.65rem', borderRadius: '10px', background: 'linear-gradient(135deg,#8b5cf6,#ec4899)', border: 'none', color: '#fff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}>Thử lại</button>
+                  <button onClick={handleClosePaywall} className="app-button app-button--ghost app-button--sm app-button--grow">Đóng</button>
+                  <button onClick={() => setPayStatus('qr')} className="app-button app-button--primary app-button--sm app-button--grow-2">Thử lại</button>
                 </div>
               </>)}
             </motion.div>
@@ -1095,7 +1197,18 @@ const App = () => {
 };
 
 // Sub-components
-const AIWisdomSection = ({ loading, chatHistory, onAsk, onSendQuestion, isAIPaid, onRequestPayment }) => {
+const LockedAiPanel = ({ title, description, actionLabel = 'Mở khóa AI', onUnlock, unlocked = false }) => (
+  <div style={{ padding: '1.25rem', borderRadius: '16px', border: '1px solid rgba(236,72,153,0.28)', background: 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(236,72,153,0.08))', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem' }}>
+    <Lock size={20} color="#f59e0b" />
+    <div style={{ color: '#fff', fontWeight: 700 }}>{title}</div>
+    <p style={{ color: 'rgba(255,255,255,0.58)', fontSize: '0.82rem', lineHeight: 1.55, margin: 0 }}>{description}</p>
+    <button type="button" onClick={onUnlock} className="app-button app-button--primary app-button--sm app-button--pill">
+      {unlocked ? actionLabel : `${actionLabel} · ${PRICE.toLocaleString('vi-VN')} ₫`}
+    </button>
+  </div>
+);
+
+const AIWisdomSection = ({ loading, chatHistory, onAsk, onSendQuestion, isAIPaid }) => {
   const [questionInput, setQuestionInput] = useState('');
   const endOfMessagesRef = useRef(null);
 
@@ -1154,11 +1267,11 @@ const AIWisdomSection = ({ loading, chatHistory, onAsk, onSendQuestion, isAIPaid
               </p>
             </div>
             <motion.button
-              onClick={() => onRequestPayment(onAsk)}
+              onClick={onAsk}
               whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-              style={{ background: 'linear-gradient(135deg, #8b5cf6, #ec4899)', border: 'none', borderRadius: '30px', padding: '0.7rem 1.6rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#fff', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer', fontFamily: 'Outfit, sans-serif', boxShadow: '0 4px 18px rgba(139,92,246,0.4)' }}
+              className="app-button app-button--primary app-button--pill"
             >
-              <Lock size={14} color="#fff" /> Mở khoá · 5.000 ₫
+              <Lock size={14} color="#fff" /> Mở khoá AI · {PRICE.toLocaleString('vi-VN')} ₫
             </motion.button>
           </div>
         </motion.div>
@@ -1173,7 +1286,7 @@ const AIWisdomSection = ({ loading, chatHistory, onAsk, onSendQuestion, isAIPaid
         >
           <Bot size={32} color="#ec4899" />
           <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.95rem' }}>Nhấn để nhận phân tích chuyên sâu từ AI</p>
-          <motion.div whileHover={{ scale: 1.05 }} style={{ background: '#fff', color: '#ec4899', padding: '0.7rem 2rem', borderRadius: '30px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <motion.div whileHover={{ scale: 1.05 }} className="app-button app-button--pill" style={{ background: '#fff', color: '#ec4899', boxShadow: 'none' }}>
             <Zap size={18} fill="#ec4899" /> Bắt đầu ngay
           </motion.div>
         </motion.div>
@@ -1295,7 +1408,7 @@ const SoulmateInsightCard = ({ title, icon: Icon, color, content, loading }) => 
   </div>
 );
 
-const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading, error, setError }) => {
+const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading, error, setError, isPaid, requirePayment }) => {
   const parseDob = (str) => {
     // Accept dd/mm/yyyy
     const parts = str.split('/');
@@ -1315,22 +1428,26 @@ const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading
     if (!d1 || !d2) { setError('Nhập ngày sinh theo định dạng dd/mm/yyyy'); return; }
     if (!form.name1.trim() || !form.name2.trim()) { setError('Vui lòng nhập đầy đủ tên cả hai người'); return; }
 
-    setLoading(true);
-    const lp1 = calculateLifePath(d1.isoStr);
-    const dest1 = calculateNameNumber(form.name1);
-    const lp2 = calculateLifePath(d2.isoStr);
-    const dest2 = calculateNameNumber(form.name2);
+    const runAnalysis = async () => {
+      setLoading(true);
+      const lp1 = calculateLifePath(d1.isoStr);
+      const dest1 = calculateNameNumber(form.name1);
+      const lp2 = calculateLifePath(d2.isoStr);
+      const dest2 = calculateNameNumber(form.name2);
 
-    const res = await generateSoulmateAnalysis(
-      { name: form.name1, dob: form.dob1, lp: lp1, destiny: dest1 },
-      { name: form.name2, dob: form.dob2, lp: lp2, destiny: dest2 }
-    );
-    setLoading(false);
-    if (res) {
-      setResult({ ...res, lp1, lp2, name1: form.name1, name2: form.name2 });
-    } else {
-      setError('AI không thể phân tích lúc này, thử lại nhé!');
-    }
+      const res = await generateSoulmateAnalysis(
+        { name: form.name1, dob: form.dob1, lp: lp1, destiny: dest1 },
+        { name: form.name2, dob: form.dob2, lp: lp2, destiny: dest2 }
+      );
+      setLoading(false);
+      if (res) {
+        setResult({ ...res, lp1, lp2, name1: form.name1, name2: form.name2 });
+      } else {
+        setError('AI không thể phân tích lúc này, thử lại nhé!');
+      }
+    };
+
+    runAnalysis();
   };
 
   if (result) {
@@ -1344,7 +1461,7 @@ const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading
             <motion.button
               onClick={() => setResult(null)}
               whileTap={{ scale: 0.95 }}
-              style={{ padding: '0.45rem 1rem', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '20px', color: 'var(--text-dim)', fontSize: '0.8rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'Outfit, sans-serif', display: 'flex', alignItems: 'center', gap: '0.3rem' }}
+              className="app-button app-button--ghost app-button--sm app-button--pill"
             >
               ← Nhập lại
             </motion.button>
@@ -1436,7 +1553,7 @@ const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
             <h2 className="primary-gradient-text" style={{ fontSize: '1.5rem', marginBottom: '0.35rem', lineHeight: 1.2, fontWeight: 700, whiteSpace: 'nowrap' }}>Tương Hợp Tâm Linh</h2>
-            <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.4 }}>AI phân tích nghiệp duyên &amp; cảnh báo tình cảm.</p>
+            <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.4 }}>AI phân tích nghiệp duyên<br />&amp; cảnh báo tình cảm.</p>
           </div>
 
           <form onSubmit={handleAnalyze}>
@@ -1489,15 +1606,7 @@ const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading
               type="submit"
               whileTap={{ scale: 0.97 }}
               whileHover={{ scale: 1.02 }}
-              style={{
-                width: '100%', padding: '1rem',
-                background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
-                border: 'none', borderRadius: '14px', color: '#fff',
-                fontSize: '1rem', fontWeight: 700, fontFamily: 'Outfit, sans-serif',
-                cursor: 'pointer', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', gap: '0.5rem',
-                boxShadow: '0 4px 20px rgba(236, 72, 153, 0.35)',
-              }}
+              className="app-button app-button--primary app-button--full app-button--lg"
             >
               <Heart size={18} fill="#fff" /> Phân tích duyên số
             </motion.button>
@@ -1866,3 +1975,6 @@ const PremiumCard = ({ card }) => {
 };
 
 export default App;
+
+
+
