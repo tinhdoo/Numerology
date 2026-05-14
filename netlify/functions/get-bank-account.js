@@ -3,7 +3,7 @@
  * Frontend calls: /.netlify/functions/get-bank-account
  * This avoids CORS issues with calling SePay API directly from browser
  */
-exports.handler = async (event) => {
+export const handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -14,7 +14,7 @@ exports.handler = async (event) => {
     return { statusCode: 200, headers, body: '' };
   }
 
-  const apiKey = process.env.VITE_SEPAY_API_KEY || process.env.SEPAY_API_KEY;
+  const apiKey = process.env.SEPAY_API_KEY || process.env.VITE_SEPAY_API_KEY;
   if (!apiKey) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'No API key' }) };
   }

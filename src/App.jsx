@@ -6,7 +6,7 @@ import {
   calculatePersonalYear, getDetailedAnalysis
 } from './utils/numerology';
 import { westernDeck } from './utils/westernCards';
-import { generateAIAdvice, askFollowUpQuestion, generateIndividualCardMeanings, generateNumerologyReport, generateMonthlyPredictions, generateSoulmateAnalysis } from './utils/aiWisdom';
+import { generateAIAdvice, askFollowUpQuestion, generateIndividualCardMeanings, generateNumerologyReport, generateMonthlyPredictions, generateSoulmateAnalysis, generateDailyCosmicMessage } from './utils/aiWisdom';
 import { generateTransactionCode, fetchSePayAccount, getVietQRUrl, pollPaymentConfirmation, PRICE } from './utils/payment';
 
 const useMousePosition = () => {
@@ -116,6 +116,21 @@ const App = () => {
   const [soulmateResult, setSoulmateResult] = useState(null);
   const [soulmateLoading, setSoulmateLoading] = useState(false);
   const [soulmateError, setSoulmateError] = useState('');
+
+  // Daily Cosmic Message State
+  const [showDailyMessage, setShowDailyMessage] = useState(false);
+  const [dailyMessage, setDailyMessage] = useState('');
+  const [dailyMessageLoading, setDailyMessageLoading] = useState(false);
+
+  const handleDailyMessage = async () => {
+    setShowDailyMessage(true);
+    if (!dailyMessage) {
+      setDailyMessageLoading(true);
+      const msg = await generateDailyCosmicMessage();
+      setDailyMessage(msg);
+      setDailyMessageLoading(false);
+    }
+  };
 
   const shuffleSound = useRef(null);
   useEffect(() => {
@@ -250,6 +265,7 @@ const App = () => {
   }, [payStatus, txCode]);
 
   const handlePaymentPolling = () => {
+    stopPollRef.current?.(); // Dừng vòng lặp polling tự động trước đó để tránh bị đơ/trùng lặp
     setPayStatus('polling');
     const stop = pollPaymentConfirmation(txCode,
       () => {
@@ -408,9 +424,34 @@ const App = () => {
                       transition={{ duration: 0.6, ease: 'easeOut' }}
                     >
                       <h1 className="hero-title primary-gradient-text" style={{ marginBottom: '0.5rem' }}>TOMATO</h1>
-                      <p style={{ color: '#555', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500, fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>
+                      <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: '0.72rem', letterSpacing: '0.18em', textTransform: 'uppercase', fontWeight: 500, fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>
                         Tiềm năng&nbsp;•&nbsp;Duyên số&nbsp;•&nbsp;Trực giác
                       </p>
+                      <p style={{ color: 'var(--primary-light)', fontSize: '0.8rem', marginTop: '0.25rem', letterSpacing: '0.05em', fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>
+                        AI Spiritual Experience
+                      </p>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={handleDailyMessage}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2))',
+                          border: '1px solid rgba(139, 92, 246, 0.4)',
+                          borderRadius: '20px',
+                          padding: '0.4rem 1rem',
+                          marginTop: '1.25rem',
+                          color: '#fff',
+                          fontSize: '0.85rem',
+                          cursor: 'pointer',
+                          fontWeight: 600,
+                          boxShadow: '0 4px 15px rgba(139, 92, 246, 0.2)'
+                        }}
+                      >
+                        <span>✨</span> Thông điệp hôm nay
+                      </motion.div>
                     </motion.div>
                   </div>
 
@@ -908,6 +949,82 @@ const App = () => {
             )}
           </AnimatePresence>
         </main>
+
+        {/* Daily Cosmic Message Modal */}
+        <AnimatePresence>
+          {showDailyMessage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              style={{
+                position: 'fixed',
+                inset: 0,
+                background: 'rgba(5, 5, 15, 0.8)',
+                backdropFilter: 'blur(10px)',
+                zIndex: 1000,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '1.5rem'
+              }}
+              onClick={() => setShowDailyMessage(false)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                transition={{ type: 'spring', damping: 20 }}
+                style={{
+                  background: 'rgba(15, 15, 30, 0.72)',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '24px',
+                  padding: '2.5rem',
+                  maxWidth: '450px',
+                  width: '100%',
+                  textAlign: 'center',
+                  boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                  position: 'relative'
+                }}
+                onClick={e => e.stopPropagation()}
+              >
+                <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                  <Sparkles size={32} color="var(--primary-light)" />
+                </div>
+                <h3 className="primary-gradient-text" style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: '1rem' }}>Thông Điệp Vũ Trụ</h3>
+                
+                {dailyMessageLoading ? (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', padding: '1rem 0' }}>
+                    <Loader2 className="loader-spin" size={24} color="var(--primary-light)" />
+                    <p style={{ color: 'var(--text-dim)', fontSize: '0.875rem' }}>Đang kết nối với các vì sao...</p>
+                  </div>
+                ) : (
+                  <p style={{ color: 'rgba(255, 255, 255, 0.85)', fontSize: '1rem', lineHeight: 1.6, marginBottom: '2rem', fontFamily: '"Be Vietnam Pro", Outfit, sans-serif' }}>
+                    "{dailyMessage}"
+                  </p>
+                )}
+
+                <button
+                  onClick={() => setShowDailyMessage(false)}
+                  style={{
+                    background: 'linear-gradient(135deg, #8b5cf6, #ec4899)',
+                    border: 'none',
+                    borderRadius: '12px',
+                    padding: '0.75rem 1.5rem',
+                    color: '#fff',
+                    fontWeight: 600,
+                    fontSize: '0.875rem',
+                    cursor: 'pointer',
+                    fontFamily: 'Outfit, sans-serif',
+                    boxShadow: '0 4px 15px rgba(139, 92, 246, 0.3)'
+                  }}
+                >
+                  Đón nhận
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* ── App-level Paywall Modal ── */}
@@ -946,9 +1063,18 @@ const App = () => {
               </>)}
 
               {payStatus === 'polling' && (<>
-                <motion.div animate={{ rotate: 360 }} transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}><Loader2 size={40} color="#8b5cf6" /></motion.div>
+                <Loader2 size={40} color="#8b5cf6" style={{ animation: 'spin 1s linear infinite' }} />
                 <div style={{ color: '#fff', fontWeight: 600 }}>Đang xác nhận thanh toán...</div>
                 <div style={{ color: 'rgba(255,255,255,0.45)', fontSize: '0.78rem', lineHeight: 1.6 }}>Tự động mở khoá sau khi xác nhận.</div>
+                <button 
+                  onClick={() => {
+                    stopPollRef.current?.();
+                    setPayStatus('qr');
+                  }} 
+                  style={{ marginTop: '1rem', padding: '0.5rem 1rem', borderRadius: '10px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'Outfit,sans-serif' }}
+                >
+                  ← Quay lại
+                </button>
               </>)}
 
               {payStatus === 'error' && (<>

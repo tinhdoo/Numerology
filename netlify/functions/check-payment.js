@@ -3,7 +3,7 @@
  * Frontend calls: /.netlify/functions/check-payment?code=TOMATO123456
  * This avoids CORS issues with calling SePay API directly from browser
  */
-exports.handler = async (event) => {
+export const handler = async (event) => {
   const headers = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
@@ -19,13 +19,19 @@ exports.handler = async (event) => {
     return { statusCode: 400, headers, body: JSON.stringify({ found: false, error: 'Missing code' }) };
   }
 
-  const apiKey = process.env.VITE_SEPAY_API_KEY || process.env.SEPAY_API_KEY;
+  const apiKey = process.env.SEPAY_API_KEY || process.env.VITE_SEPAY_API_KEY;
   if (!apiKey) {
     return { statusCode: 500, headers, body: JSON.stringify({ found: false, error: 'No API key' }) };
   }
 
   try {
-    const res = await fetch('https://userapi.sepay.vn/v2/transactions?per_page=20', {
+    const params = new URLSearchParams({
+      per_page: '20',
+      q: code,
+      amount_in_min: '2000',
+    });
+
+    const res = await fetch(`https://userapi.sepay.vn/v2/transactions?${params}`, {
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
@@ -42,7 +48,8 @@ exports.handler = async (event) => {
     const found = txns.find(t => {
       const content = String(t.transaction_content || t.description || t.code || t.content || '');
       const amount = Number(t.amount_in || t.amount || t.transferAmount || 0);
-      return content.toUpperCase().includes(code.toUpperCase()) && amount >= 2000;
+      const transferType = String(t.transfer_type || t.transferType || 'in').toLowerCase();
+      return transferType === 'in' && content.toUpperCase().includes(code.toUpperCase()) && amount >= 2000;
     });
 
     return {
