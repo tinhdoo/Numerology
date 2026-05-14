@@ -223,8 +223,8 @@ const App = () => {
       const code = generateTransactionCode();
       setTxCode(code);
       setQrUrl(getVietQRUrl({
-        bankId: account?.bank_short_name || account?.bank_code || 'MB',
-        accountNo: account?.account_number || account?.accountNo || '',
+        bankId: account?.payment_bank_id || account?.bank_short_name || account?.bank_code || 'MB',
+        accountNo: account?.payment_account_number || account?.account_number || account?.accountNo || '',
         amount: PRICE, description: code,
       }));
       setPayStatus('qr');

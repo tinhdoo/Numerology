@@ -15,6 +15,8 @@ export const handler = async (event) => {
   }
 
   const apiKey = process.env.SEPAY_API_KEY || process.env.VITE_SEPAY_API_KEY;
+  const qrAccountNo = process.env.SEPAY_QR_ACCOUNT_NO;
+  const qrBankId = process.env.SEPAY_QR_BANK_ID;
   if (!apiKey) {
     return { statusCode: 500, headers, body: JSON.stringify({ error: 'No API key' }) };
   }
@@ -32,6 +34,17 @@ export const handler = async (event) => {
     }
 
     const data = await res.json();
+    const accounts = data?.bankaccounts || data?.data;
+    if (Array.isArray(accounts) && (qrAccountNo || qrBankId)) {
+      const patchedAccounts = accounts.map(account => ({
+        ...account,
+        payment_account_number: qrAccountNo || account.account_number,
+        payment_bank_id: qrBankId || account.bank_short_name || account.bank_code,
+      }));
+
+      if (data.bankaccounts) data.bankaccounts = patchedAccounts;
+      if (data.data) data.data = patchedAccounts;
+    }
     
     return {
       statusCode: 200,
