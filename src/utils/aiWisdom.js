@@ -77,7 +77,7 @@ const generateWithFallback = async (prompt) => {
 const _cache = new Map();
 
 const cachedGenerate = async (prompt) => {
-  const key = prompt.slice(0, 200);
+  const key = prompt;
   if (_cache.has(key)) {
     console.info("Cache hit — skipping API call");
     return _cache.get(key);
@@ -162,7 +162,9 @@ ${historyText}
 
 Người dùng hỏi tiếp: ${newQuestion}
 
-Hãy đưa ra câu trả lời ngắn gọn, đúng trọng tâm câu hỏi của người dùng dựa trên ngữ cảnh tâm linh ở trên bằng tiếng Việt. Phong cách bí ẩn nhưng rõ ràng.`;
+Hãy đưa ra câu trả lời chi tiết, sâu sắc và rõ nghĩa hơn dựa trên ngữ cảnh tâm linh ở trên bằng tiếng Việt.
+Tránh những câu trả lời sáo rỗng hay quá chung chung. Hãy đi sâu vào ý nghĩa của các con số/lá bài (nếu có trong ngữ cảnh) và đưa ra lời khuyên hoặc hướng dẫn cụ thể cho hành động của họ.
+Phong cách bí ẩn, sang trọng nhưng vẫn dễ hiểu và mang tính chữa lành.`;
 
     return await cachedGenerate(prompt);
   } catch (error) {

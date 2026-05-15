@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap');
 
 :root {
   --bg-deep: #09090b; /* Zinc 950 */
@@ -21,6 +21,7 @@
   --button-quiet-border: rgba(255, 255, 255, 0.12);
   --button-shadow: 0 4px 18px rgba(139, 92, 246, 0.34);
   --button-shadow-hover: 0 8px 26px rgba(139, 92, 246, 0.45);
+  --mystic-cursor: url('/cursor-mystic.svg') 16 16, auto;
 }
 
 * {
@@ -35,11 +36,17 @@ body {
   color: var(--text-main);
   overflow-x: hidden;
   min-height: 100vh;
+  cursor: var(--mystic-cursor);
 }
 
 button {
   font-family: var(--button-font);
   -webkit-tap-highlight-color: transparent;
+}
+
+.app-wrapper,
+.app-wrapper * {
+  cursor: var(--mystic-cursor) !important;
 }
 
 button:focus-visible {
@@ -111,6 +118,51 @@ h1, h2, h3, h4, h5, h6 {
   background-size: 300px 300px;
   animation: moveStars2 60s linear infinite;
   opacity: 0.3;
+}
+
+.shooting-stars-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+  mix-blend-mode: screen;
+}
+
+.shooting-star {
+  position: absolute;
+  height: 1px;
+  transform-origin: right center;
+  filter: drop-shadow(0 0 5px rgba(180, 205, 255, 0.35));
+}
+
+.shooting-star::before {
+  content: '';
+  position: absolute;
+  right: -1px;
+  top: 50%;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow:
+    0 0 7px rgba(255, 255, 255, 0.75),
+    0 0 12px rgba(125, 170, 255, 0.35);
+  transform: translateY(-50%);
+}
+
+.shooting-star span {
+  position: absolute;
+  inset: 0;
+  display: block;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(160, 190, 255, 0.04) 18%,
+    rgba(215, 228, 255, 0.24) 68%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
 }
 
 @keyframes moveStars {
@@ -213,11 +265,15 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .hero-title {
-  font-size: 5rem;
-  line-height: 1.1;
+  font-family: 'Cinzel Decorative', 'Outfit', serif;
+  font-size: clamp(3.25rem, 12vw, 5.25rem);
+  line-height: 0.95;
   margin-bottom: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-shadow:
+    0 0 18px rgba(167, 139, 250, 0.34),
+    0 8px 34px rgba(0, 0, 0, 0.45);
 }
 
 .hero-desc {
@@ -269,6 +325,9 @@ h1, h2, h3, h4, h5, h6 {
   .stars-layer::before,
   .stars-layer::after {
     animation: none !important;
+  }
+  .shooting-star {
+    filter: drop-shadow(0 0 3px rgba(180, 205, 255, 0.28));
   }
   .cursor-trail {
     display: none !important;
@@ -1032,8 +1091,8 @@ h1, h2, h3, h4, h5, h6 {
 
 .western-setup-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
   align-items: start;
 }
 
@@ -1075,6 +1134,14 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   color: var(--primary-light);
+}
+
+.soulmate-form-subtitle {
+  color: var(--text-dim);
+  font-size: 0.76rem;
+  line-height: 1.35;
+  max-width: 260px;
+  margin: 0 auto;
 }
 
 /* Western Results */
@@ -1415,9 +1482,10 @@ h1, h2, h3, h4, h5, h6 {
 
 @media (max-width: 480px) {
   .western-setup-screen {
-    min-height: calc(100dvh - 92px);
-    justify-content: flex-start;
-    padding-top: 1rem;
+    min-height: calc(100dvh - 120px);
+    justify-content: center;
+    padding-top: 0;
+    padding-bottom: 1rem;
   }
 
   .western-setup-shell {
@@ -1478,6 +1546,12 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 0.86rem;
   }
 
+  .soulmate-form-subtitle {
+    font-size: 0.7rem;
+    line-height: 1.28;
+    max-width: 210px;
+  }
+
   .western-shuffle-screen {
     min-height: calc(100dvh - 120px);
     padding: clamp(2.2rem, 9vh, 4.2rem) 0 1rem;
@@ -1510,30 +1584,6 @@ h1, h2, h3, h4, h5, h6 {
     width: 166px;
     height: 76px;
   }
-}
-
-/* Custom Cursor */
-.cursor-trail {
-  position: fixed;
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--primary);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transition: transform 0.1s ease-out;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.cursor-trail::after {
-  content: '';
-  width: 4px;
-  height: 4px;
-  background: var(--primary-light);
-  border-radius: 50%;
 }
 
 /* AI Chat UI */

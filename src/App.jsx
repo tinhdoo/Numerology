@@ -31,33 +31,46 @@ const ShootingStars = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (Math.random() > 0.5) {
-        setStars(prev => [...prev.slice(-3), { id: Date.now(), x: Math.random() * 100, y: Math.random() * 40 }]);
+      if (Math.random() > 0.62) {
+        setStars(prev => [
+          ...prev.slice(-2),
+          {
+            id: Date.now(),
+            x: 10 + Math.random() * 80,
+            y: 4 + Math.random() * 34,
+            drift: 18 + Math.random() * 18,
+            drop: 10 + Math.random() * 12,
+            length: 54 + Math.random() * 52,
+            duration: 1.15 + Math.random() * 0.75,
+            angle: -28 - Math.random() * 16,
+            delay: Math.random() * 0.2
+          }
+        ]);
       }
-    }, 2500);
+    }, 3200);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 1, overflow: 'hidden' }}>
+    <div className="shooting-stars-layer">
       <AnimatePresence>
         {stars.map(star => (
           <motion.div
             key={star.id}
-            initial={{ opacity: 0, x: `${star.x}vw`, y: `${star.y}vh`, scale: 0 }}
-            animate={{ opacity: [0, 1, 0], x: `${star.x - 15}vw`, y: `${star.y + 15}vh`, scale: [0, 1, 0] }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: "easeOut" }}
-            style={{
-              position: 'absolute',
-              width: '120px',
-              height: '2px',
-              background: 'linear-gradient(90deg, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 100%)',
-              transformOrigin: 'left',
-              transform: 'rotate(-45deg)',
-              boxShadow: '0 0 10px rgba(255,255,255,0.5)'
+            className="shooting-star"
+            initial={{ opacity: 0, x: `${star.x}vw`, y: `${star.y}vh`, scaleX: 0.45 }}
+            animate={{
+              opacity: [0, 0.75, 0.55, 0],
+              x: `${star.x - star.drift}vw`,
+              y: `${star.y + star.drop}vh`,
+              scaleX: [0.55, 1, 0.92, 0.25]
             }}
-          />
+            exit={{ opacity: 0 }}
+            transition={{ duration: star.duration, delay: star.delay, ease: [0.2, 0.65, 0.2, 1] }}
+            style={{ width: star.length, rotate: `${star.angle}deg` }}
+          >
+            <span />
+          </motion.div>
         ))}
       </AnimatePresence>
     </div>
@@ -111,6 +124,31 @@ const getContextualCardMeaning = (card, category) => {
     : 'Bạn có thể chủ động hơn, nhưng vẫn nên quan sát tín hiệu thực tế.';
 
   return `Với chủ đề ${category}, lá ${rank} ${card.suit} cho thấy ${theme}; ${baseTone}. ${direction}`;
+};
+
+const getQuickSummary = (cards) => {
+  if (!cards || cards.length === 0) return '';
+  const suits = cards.map(c => c.symbol);
+  const counts = {};
+  suits.forEach(s => counts[s] = (counts[s] || 0) + 1);
+  
+  let maxSuit = '♥';
+  let maxCount = 0;
+  for (const s in counts) {
+    if (counts[s] > maxCount) {
+      maxCount = counts[s];
+      maxSuit = s;
+    }
+  }
+  
+  const summaries = {
+    '♥': 'Quẻ bài mang năng lượng tích cực của tình cảm và trực giác. Mọi việc đang hướng tới sự hài hòa, hãy lắng nghe con tim dẫn lối.',
+    '♦': 'Quẻ bài cho thấy sự chuyển dịch, tin tức hoặc cơ hội mới đang đến. Bạn cần nhanh nhẹn nắm bắt và tính toán kỹ lưỡng.',
+    '♣': 'Năng lượng của sự bền bỉ, công việc và tài chính đang làm chủ. Kết quả tốt đẹp sẽ đến từ hành động thực tế của bạn.',
+    '♠': 'Quẻ bài cảnh báo những thử thách, trở ngại hoặc áp lực dồn nén. Đây là lúc bạn cần chậm lại và thận trọng trong mọi quyết định.'
+  };
+  
+  return summaries[maxSuit] || summaries['♥'];
 };
 
 const FormattedText = ({ text }) => {
@@ -478,7 +516,6 @@ const App = () => {
   return (
     <>
       <div className="app-wrapper">
-        <div className="cursor-trail" style={{ left: mousePos.x, top: mousePos.y }} />
         <ShootingStars />
         <div className="celestial-bg" style={{ transform: `translate(${mousePos.px}px, ${mousePos.py}px)`, transition: 'transform 0.1s ease-out' }}>
           <div className="nebula-glow" style={{ top: '-20%', left: '-10%', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.3) 0%, transparent 60%)' }}></div>
@@ -1023,6 +1060,11 @@ const App = () => {
                         <button onClick={resetWesternReading} className="back-btn">← Trải bài mới</button>
                       </div>
 
+                      <div style={{ background: 'rgba(139, 92, 246, 0.1)', border: '1px solid rgba(139, 92, 246, 0.2)', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.5rem' }}>
+                        <p style={{ color: 'var(--primary-light)', fontSize: '0.7rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.5rem' }}>Tóm tắt quẻ bài</p>
+                        <p style={{ color: '#fff', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 }}>"{getQuickSummary(finalCards)}"</p>
+                      </div>
+
                       <div className="western-card-meanings">
                         {finalCards.map((card, i) => (
                           <div key={i} className="report-card" style={{ marginBottom: 0 }}>
@@ -1420,6 +1462,45 @@ const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading
     return { isoStr: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}` };
   };
 
+  const buildPreviewResult = (d1, d2) => {
+    const lp1 = calculateLifePath(d1.isoStr);
+    const dest1 = calculateNameNumber(form.name1);
+    const lp2 = calculateLifePath(d2.isoStr);
+    const dest2 = calculateNameNumber(form.name2);
+    const lpGap = Math.abs(lp1 - lp2);
+    const destinyGap = Math.abs(dest1 - dest2);
+    const matchPercent = Math.max(45, Math.min(92, 82 - lpGap * 4 - destinyGap * 2 + (lp1 === lp2 ? 10 : 0)));
+
+    return {
+      isPreview: true,
+      lp1,
+      lp2,
+      dest1,
+      dest2,
+      name1: form.name1.trim(),
+      name2: form.name2.trim(),
+      matchPercent,
+      summary: `${form.name1.trim()} và ${form.name2.trim()} có mức cộng hưởng ${matchPercent}%, đủ để xem hướng kết nối chính giữa hai người.`,
+      emotion: `Điểm xem trước: Đường Đời ${lp1} và ${lp2} cho thấy cách hai người trao đổi cảm xúc có thể bổ trợ nhau nếu biết giữ nhịp lắng nghe. Phần phân tích đầy đủ sẽ mở khóa cảm xúc, giao tiếp, nghiệp duyên và cảnh báo cần lưu ý.`
+    };
+  };
+
+  const unlockFullAnalysis = async () => {
+    if (!result) return;
+    setLoading(true);
+    const res = await generateSoulmateAnalysis(
+      { name: result.name1, dob: form.dob1, lp: result.lp1, destiny: result.dest1 },
+      { name: result.name2, dob: form.dob2, lp: result.lp2, destiny: result.dest2 }
+    );
+    setLoading(false);
+
+    if (res) {
+      setResult({ ...res, lp1: result.lp1, lp2: result.lp2, dest1: result.dest1, dest2: result.dest2, name1: result.name1, name2: result.name2, isPreview: false });
+    } else {
+      setError('AI không thể phân tích lúc này, thử lại nhé!');
+    }
+  };
+
   const handleAnalyze = async (e) => {
     e.preventDefault();
     setError('');
@@ -1428,26 +1509,7 @@ const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading
     if (!d1 || !d2) { setError('Nhập ngày sinh theo định dạng dd/mm/yyyy'); return; }
     if (!form.name1.trim() || !form.name2.trim()) { setError('Vui lòng nhập đầy đủ tên cả hai người'); return; }
 
-    const runAnalysis = async () => {
-      setLoading(true);
-      const lp1 = calculateLifePath(d1.isoStr);
-      const dest1 = calculateNameNumber(form.name1);
-      const lp2 = calculateLifePath(d2.isoStr);
-      const dest2 = calculateNameNumber(form.name2);
-
-      const res = await generateSoulmateAnalysis(
-        { name: form.name1, dob: form.dob1, lp: lp1, destiny: dest1 },
-        { name: form.name2, dob: form.dob2, lp: lp2, destiny: dest2 }
-      );
-      setLoading(false);
-      if (res) {
-        setResult({ ...res, lp1, lp2, name1: form.name1, name2: form.name2 });
-      } else {
-        setError('AI không thể phân tích lúc này, thử lại nhé!');
-      }
-    };
-
-    runAnalysis();
+    setResult(buildPreviewResult(d1, d2));
   };
 
   if (result) {
@@ -1486,10 +1548,22 @@ const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading
 
           {/* 4 Insight Cards */}
           <div className="report-section">
-            <SoulmateInsightCard title="Cảm xúc & Tình cảm" icon={Heart} color="#f43f5e" content={result.emotion} loading={loading} />
-            <SoulmateInsightCard title="Giao tiếp & Xung đột" icon={MessageCircle} color="#60a5fa" content={result.communication} loading={loading} />
-            <SoulmateInsightCard title="Nghiệp duyên & Bài học chung" icon={Infinity} color="#c084fc" content={result.karmic} loading={loading} />
-            <SoulmateInsightCard title="⚠️ Red Flag cần lưu ý" icon={AlertTriangle} color="#f97316" content={result.redFlag} loading={loading} />
+            <SoulmateInsightCard title={result.isPreview ? 'Xem trước tương hợp' : 'Cảm xúc & Tình cảm'} icon={Heart} color="#f43f5e" content={result.emotion} loading={loading} />
+            {result.isPreview ? (
+              <LockedAiPanel
+                title="Mở khóa phân tích đầy đủ"
+                description="Xem trọn bộ diễn giải AI về cảm xúc, giao tiếp, nghiệp duyên và cảnh báo cần lưu ý cho hai người."
+                actionLabel={isPaid ? 'Xem phân tích đầy đủ' : 'Mở khóa full'}
+                onUnlock={() => requirePayment('soulmate', unlockFullAnalysis)}
+                unlocked={isPaid}
+              />
+            ) : (
+              <>
+                <SoulmateInsightCard title="Giao tiếp & Xung đột" icon={MessageCircle} color="#60a5fa" content={result.communication} loading={loading} />
+                <SoulmateInsightCard title="Nghiệp duyên & Bài học chung" icon={Infinity} color="#c084fc" content={result.karmic} loading={loading} />
+                <SoulmateInsightCard title="⚠️ Red Flag cần lưu ý" icon={AlertTriangle} color="#f97316" content={result.redFlag} loading={loading} />
+              </>
+            )}
           </div>
         </div>
       </motion.section>
@@ -1553,7 +1627,7 @@ const SoulmateSection = ({ form, setForm, result, setResult, loading, setLoading
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
             <h2 className="primary-gradient-text" style={{ fontSize: '1.5rem', marginBottom: '0.35rem', lineHeight: 1.2, fontWeight: 700, whiteSpace: 'nowrap' }}>Tương Hợp Tâm Linh</h2>
-            <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem', lineHeight: 1.4 }}>AI phân tích nghiệp duyên<br />&amp; cảnh báo tình cảm.</p>
+            <p className="soulmate-form-subtitle">AI phân tích nghiệp duyên &amp; cảnh báo tình cảm.</p>
           </div>
 
           <form onSubmit={handleAnalyze}>
