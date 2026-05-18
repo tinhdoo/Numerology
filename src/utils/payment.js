@@ -5,8 +5,8 @@
  * Functions, and those functions call SePay with SEPAY_API_KEY.
  */
 
-const PRICE = 2000; // VND
-const DESCRIPTION_PREFIX = 'TOMATO';
+const PRICE = 5000; // VND
+const DESCRIPTION_PREFIX = 'ASTRA';
 
 /**
  * Generate a unique transaction code for this session.

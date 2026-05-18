@@ -43,12 +43,12 @@ export const handler = async (event) => {
       return json({ success: true, ignored: 'not incoming' });
     }
 
-    const tomatoMatch = txContent.match(/TOMATO\d{6}/i);
-    if (!tomatoMatch) {
-      return json({ success: true, ignored: 'no TOMATO code' });
+    const astraMatch = txContent.match(/ASTRA\d{6}/i);
+    if (!astraMatch) {
+      return json({ success: true, ignored: 'no ASTRA code' });
     }
 
-    const txCode = tomatoMatch[0].toUpperCase();
+    const txCode = astraMatch[0].toUpperCase();
     console.log(`[SePay] Payment confirmed: ${txCode} - ${amount} VND`);
 
     return json({ success: true });

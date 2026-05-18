@@ -58,7 +58,23 @@ export const calculatePersonalYear = (dob) => {
   return reduceNumber(rMonth + rDay + rYear, true);
 };
 
-export const getDetailedAnalysis = (lp, destiny, soul) => {
+export const getDetailedAnalysis = (lp, destiny, soul, language = 'vi') => {
+  if (language === 'en') {
+    return {
+      lpText: `Life Path ${lp} shows the main rhythm of your journey. This number describes how you naturally move through challenges, growth, and personal purpose.`,
+      destinyText: `Destiny Number ${destiny} points to the role you are learning to embody. It reflects how your talents can become clearer when you act with intention.`,
+      advice: `This year, keep your focus practical: choose one priority, refine your habits, and let your energy build steadily instead of scattering it.`
+    };
+  }
+
+  if (language === 'zh') {
+    return {
+      lpText: `\u751f\u547d\u9053\u8def\u6570 ${lp} \u663e\u793a\u4f60\u4eba\u751f\u65c5\u7a0b\u7684\u4e3b\u8981\u8282\u594f\u3002\u5b83\u63cf\u8ff0\u4f60\u9762\u5bf9\u6311\u6218\u3001\u6210\u957f\u548c\u4f7f\u547d\u65f6\u7684\u81ea\u7136\u65b9\u5f0f\u3002`,
+      destinyText: `\u4f7f\u547d\u6570 ${destiny} \u6307\u5411\u4f60\u6b63\u5728\u5b66\u4e60\u627f\u62c5\u7684\u89d2\u8272\u3002\u5f53\u4f60\u6709\u610f\u8bc6\u5730\u884c\u52a8\u65f6\uff0c\u5929\u8d4b\u4f1a\u53d8\u5f97\u66f4\u6e05\u6670\u3002`,
+      advice: `\u4eca\u5e74\u8bf7\u4fdd\u6301\u52a1\u5b9e\uff1a\u9009\u62e9\u4e00\u4e2a\u91cd\u70b9\uff0c\u4fee\u6b63\u4e60\u60ef\uff0c\u8ba9\u80fd\u91cf\u7a33\u5b9a\u79ef\u7d2f\uff0c\u800c\u4e0d\u662f\u5206\u6563\u3002`
+    };
+  }
+
   const data = {
     lp: {
       1: "Con đường của bạn là con đường của người tiên phong. Bạn sinh ra để dẫn dắt, khởi xướng và làm chủ vận mệnh của mình. Thử thách lớn nhất là vượt qua cái tôi quá lớn.",

@@ -1,6 +1,6 @@
 /**
- * Proxy function: check if a TOMATO payment code has been received
- * Frontend calls: /.netlify/functions/check-payment?code=TOMATO123456
+ * Proxy function: check if an ASTRA payment code has been received
+ * Frontend calls: /.netlify/functions/check-payment?code=ASTRA123456
  * This avoids CORS issues with calling SePay API directly from browser
  */
 export const handler = async (event) => {
@@ -28,7 +28,7 @@ export const handler = async (event) => {
     const params = new URLSearchParams({
       per_page: '20',
       q: code,
-      amount_in_min: '2000',
+      amount_in_min: '5000',
     });
 
     const res = await fetch(`https://userapi.sepay.vn/v2/transactions?${params}`, {
@@ -49,7 +49,7 @@ export const handler = async (event) => {
       const content = String(t.transaction_content || t.description || t.code || t.content || '');
       const amount = Number(t.amount_in || t.amount || t.transferAmount || 0);
       const transferType = String(t.transfer_type || t.transferType || 'in').toLowerCase();
-      return transferType === 'in' && content.toUpperCase().includes(code.toUpperCase()) && amount >= 2000;
+      return transferType === 'in' && content.toUpperCase().includes(code.toUpperCase()) && amount >= 5000;
     });
 
     return {
